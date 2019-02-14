@@ -1,0 +1,18 @@
+
+
+## Source data
+```{r}
+library(sparklyr)
+
+# We will measure the time to load the 4.2GB taxi data.
+startTime <-  proc.time()
+
+# Open a spark connection to our local computer
+sc <- spark_connect(master = "local")
+
+# Store the data inside of spark rather than in R
+taxis <- spark_read_csv(sc, name = "taxis", path = "taxi.csv")
+
+finishTime <- proc.time()
+finishTime - startTime
+```
