@@ -1,0 +1,54 @@
+## Visualise
+
+```{r}
+library(tmaptools)
+library(sf)
+library(ggplot2)
+```
+
+### Challenge 9
+Read in the map shape file from https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+```{r}
+map <- st_read(___)
+```
+
+What does the map look like?
+```{r}
+
+```
+
+### Challenge 10
+We need to append the map with our pickup and dropoff data
+```{r}
+map <- append_data(___, ___)
+```
+
+Plot the map again and you'll see our new data appears, but it's not very nice to look at.
+```{r}
+
+```
+
+### Challenge 11
+To make our maps nicer to look at we'll use ggplot. Plot 3 maps, one for pickups, dropoffs and total.
+```{r}
+ggplot(___)+geom_sf(___)+ scale_fill_gradient(low= "dark grey", high="yellow")
+ggplot(___)+geom_sf(___)+ scale_fill_gradient(low= "dark grey", high="yellow")
+ggplot(___)+geom_sf(___)+ scale_fill_gradient(low= "dark grey", high="yellow")
+
+```
+
+
+### Challenge 11
+To make our recommendations to the taxi company, let's do a simple plot of the top 10 pickup locations
+```{r}
+top_pickups<- ___ %>% select(___, zone, borough) %>%  arrange(desc(___)) %>%  ___(10)
+```
+
+```{r}
+___(___, aes(x= ___, y = reorder(zone, pickups)))+ ___(size=3)
+```
+
+**IMPORTANT** Disconnect spark when finished to avoid running out of processing memory (RAM)
+```{r}
+spark_disconnect(sc)
+```
