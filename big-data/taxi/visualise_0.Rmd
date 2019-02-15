@@ -29,7 +29,7 @@ plot(map)
 ```
 
 ### Challenge 11
-To make our maps nicer to look at we'll use ggplot.
+To make our maps nicer to look at we'll use ggplot. Plot 3 maps, one for pickups, dropoffs and total.
 ```{r}
 ggplot(map)+geom_sf(aes(fill=pickups))+ scale_fill_gradient(low= "dark grey", high="yellow")
 ggplot(map)+geom_sf(aes(fill=dropoffs))+ scale_fill_gradient(low= "dark grey", high="yellow")
