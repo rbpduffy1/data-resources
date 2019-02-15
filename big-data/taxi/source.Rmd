@@ -1,5 +1,3 @@
-
-
 ## Source
 ```{r}
 library(sparklyr)
