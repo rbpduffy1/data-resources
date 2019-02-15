@@ -51,7 +51,7 @@ pickdrops_spark <- left_join(pickups, dropoffs, by="LocationID") %>%  arrange(Lo
 ```
 
 ```{r}
-head(pickdrops_spark)
+pickdrops_spark
 ```
 
 ### Challenge 7
