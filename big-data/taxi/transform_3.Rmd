@@ -1,0 +1,72 @@
+## Transform
+
+### Challenge 4
+Create a new variable `clean_taxis` by piping the taxi data through the `filter` function.
+
+You'll need to decide what range of data points to use.
+```{r}
+clean_taxis <- taxis %>% ___(___, RateCodeID ==1)
+```
+
+Re-make the raster plot and see if it looks more reasonable.
+```{r}
+clean_taxis %>% dbplot_raster(x=trip_distance, y=total_amount)
+```
+
+### Challenge 5
+To answer our brief we need to look at the locations where most pickups and dropoff are happening.
+
+Ultimately we want to end up with a table of data that looks something like this:
+
+| LocationID | pickups | dropoffs | total |
+| ---------- | ------- | -------- | ----- |
+|     1      |  1234   |   5678   |  6912 |
+
+Let's start with pickups.
+
+We need to
+- select only the pickups column (PULocationID) and give it a new name `LocationID`
+- group_by the newly named column to collect all the same locations together
+- sum up the taxi rides in each group using `summarise` and the count function `n()`
+- sort the final result by `LocationID` using `arrange()`
+
+```{r}
+pickups <-  clean_taxis %>% ___(___ = ___) %>% ___(___) %>% ___(pickups = n()) %>% ___(___)
+
+pickups
+```
+
+
+Now do the same for drop-offs
+```{r}
+dropoffs <-  clean_taxis %>% select(___ = ___) %>% ___(___) %>% ___(dropoffs = n()) %>% ___(___)
+
+dropoffs
+```
+
+### Challenge 6
+Join the pickups and dropoffs tables together `by` their shared `LocationID` column and sort the result.
+```{r}
+pickdrops_spark <- ___(___, ___, by="___") %>%  ___(___)
+```
+
+```{r}
+pickdrops_spark
+```
+
+### Challenge 7
+Since the the number of locations is not that big, we can now bring the data back into R using `collect()`
+```{r}
+pickdrops <- ___ %>% ___
+```
+
+### Challenge 8
+To complete the final bit of data transformation, add a total column using `mutate`
+```{r}
+pickdrops<- ___ %>% ___(___ = ___ + ___)
+```
+
+Let's have a look
+```{r}
+pickdrops
+```
