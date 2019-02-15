@@ -39,7 +39,7 @@ pickups
 
 Now do the same for drop-offs
 ```{r}
-dropoffs <-  where_taxis %>% select(LocationID = DOLocationID) %>% group_by(LocationID) %>% summarise(dropoffs = n()) %>% arrange(LocationID)
+dropoffs <-  clean_taxis %>% select(LocationID = DOLocationID) %>% group_by(LocationID) %>% summarise(dropoffs = n()) %>% arrange(LocationID)
 
 dropoffs
 ```
