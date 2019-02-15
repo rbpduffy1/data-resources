@@ -5,9 +5,9 @@ library(dbplot)
 ```
 
 ### Challenge 1
-As always, let's get a feel for the data by looking at the `head`
+As always, let's get a feel for the data by looking at the `head` of taxis
 ```{r}
-head(taxis)
+taxis %>% head()
 ```
 You can learn more about each of the columns (e.g. what does RateCodeID mean?) on the NYC gov page https://www1.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
 
