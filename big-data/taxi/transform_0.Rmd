@@ -8,7 +8,7 @@ You'll need to decide what range of data points to use.
 clean_taxis <- taxis %>% filter(trip_distance < 100, passenger_count > 0, passenger_count < 10, total_amount > 0, total_amount < 1000, RateCodeID ==1)
 ```
 
-Re make the raster plot and see if it looks more reasonable.
+Re-make the raster plot and see if it looks more reasonable.
 ```{r}
 clean_taxis %>% dbplot_raster(x=trip_distance, y=total_amount)
 ```
@@ -22,22 +22,16 @@ Ultimately we want to end up with a table of data that looks something like this
 | ---------- | ------- | -------- | ----- |
 |     1      |  1234   |   5678   |  6912 |
 
-So, we only need the pick up locations (PULocationID) and drop off locations (DOLocationID) from now on, so just select those columns.
-```{r}
-where_taxis <- clean_taxis %>% select(PULocationID, DOLocationID)
-```
-
-### Challenge 6
 Let's start with pickups.
 
 We need to
-- select only the PULocationID column and give it a new name `LocationID`
+- select only the pickups column (PULocationID) and give it a new name `LocationID`
 - group_by the newly named column to collect all the same locations together
 - sum up the taxi rides in each group using `summarise` and the count function `n()`
 - sort the final result by `LocationID` using `arrange()`
 
 ```{r}
-pickups <-  where_taxis %>% select(LocationID = PULocationID) %>% group_by(LocationID) %>% summarise(pickups = n()) %>% arrange(LocationID)
+pickups <-  clean_taxis %>% select(LocationID = PULocationID) %>% group_by(LocationID) %>% summarise(pickups = n()) %>% arrange(LocationID)
 
 pickups
 ```
@@ -50,7 +44,7 @@ dropoffs <-  where_taxis %>% select(LocationID = DOLocationID) %>% group_by(Loca
 dropoffs
 ```
 
-### Challenge 7
+### Challenge 6
 Join the pickups and dropoffs tables together `by` their shared `LocationID` column and sort the result.
 ```{r}
 pickdrops_spark <- left_join(pickups, dropoffs, by="LocationID") %>%  arrange(LocationID)
@@ -60,13 +54,13 @@ pickdrops_spark <- left_join(pickups, dropoffs, by="LocationID") %>%  arrange(Lo
 head(pickdrops_spark)
 ```
 
-### Challenge 8
+### Challenge 7
 Since the the number of locations is not that big, we can now bring the data back into R using `collect()`
 ```{r}
 pickdrops <- pickdrops_spark %>% collect()
 ```
 
-### Challenge 9
+### Challenge 8
 To complete the final bit of data transformation, add a total column using `mutate` %>% mutate(Total = dropoffs + picksups)
 
 ```{r}
