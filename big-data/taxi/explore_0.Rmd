@@ -36,4 +36,4 @@ Create a `raster` plot using `trip_distance` and `total_amount` as the x and y a
 ```{r}
 taxis %>% dbplot_raster(x=trip_distance, y=total_amount)
 ```
-Raster plots are like scatter plots, but each pixel contains many data points (like a 2D histogram - more info at https://db.rstudio.com/dbplot/#raster).
+Raster plots are like scatter plots for big data -  each pixel contains many data points (like a 2D histogram - more info at https://db.rstudio.com/dbplot/#raster).
