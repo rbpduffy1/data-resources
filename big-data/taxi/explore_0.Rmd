@@ -14,7 +14,7 @@ You can learn more about each of the columns (e.g. what does RateCodeID mean?) o
 ### Challenge 2
 Again, as always, we next want to get a summary of the data.
 
-Normally we'd use summary(), but because we are now in the **dplyr** world we need to do things a little differently (more info at https://www.rdocumentation.org/packages/dplyr).
+Normally we'd use summary(), but because we are now in the **dplyr** world we need to do things a little differently (more info at https://www.rdocumentation.org/packages/dplyr ).
 
 We need to use the `summarise_all` function and tell it what kind of summary we want. Let's start with  `max`. What do you notice? (this might take some time - you can track the progress of the job in the SparkUI)
 ```{r}
@@ -36,4 +36,4 @@ Create a `raster` plot using `trip_distance` and `total_amount` as the x and y a
 ```{r}
 taxis %>% dbplot_raster(x=trip_distance, y=total_amount)
 ```
-Raster plots are like scatter plots for big data -  each pixel contains many data points (like a 2D histogram - more info at https://db.rstudio.com/dbplot/#raster).
+Raster plots are like scatter plots for big data -  each pixel contains many data points (like a 2D histogram - more info at https://db.rstudio.com/dbplot/#raster ).
