@@ -1,0 +1,39 @@
+## Explore
+```{r}
+library(dplyr)
+library(dbplot)
+```
+
+### Challenge 1
+As always, let's get a feel for the data by looking at the `head` of taxis
+```{r}
+___ %>% ___
+```
+You can learn more about each of the columns (e.g. what does RateCodeID mean?) on the NYC gov page https://www1.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
+
+### Challenge 2
+Again, as always, we next want to get a summary of the data.
+
+Normally we'd use summary(), but because we are now in the **dplyr** world we need to do things a little differently (more info at https://www.rdocumentation.org/packages/dplyr ).
+
+We need to use the `summarise_all` function and tell it what kind of summary we want. Let's start with  `max`. What do you notice? (this might take some time - you can track the progress of the job in the SparkUI)
+```{r}
+___ %>% ___(___)
+```
+
+Now try with `min` What do you notice?
+```{r}
+___ %>% ___(___)
+```
+You try lots more, e.g. mean, median, sd, n, n_distict.
+
+### Challenge 3
+There are clearly some outliers in our data. Let's try and get a visual sense of how many outliers there are.
+
+We are using the **dbplot** library to do all the heavy visualisation calculations inside of spark rather than in R.
+
+Create a `raster` plot using `trip_distance` and `total_amount` as the x and y axes (this will take some time - you can track the progress of the job in the SparkUI)
+```{r}
+___ %>% dbplot_raster(___, ___)
+```
+Raster plots are like scatter plots for big data -  each pixel contains many data points (like a 2D histogram - more info at https://db.rstudio.com/dbplot/#raster ).
