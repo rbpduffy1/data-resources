@@ -63,7 +63,7 @@ pickdrops <- pickdrops_spark %>% collect()
 ### Challenge 8
 To complete the final bit of data transformation, add a total column using `mutate`
 ```{r}
-pickdrops %>% mutate(total = dropoffs + picksups)
+pickdrops<- pickdrops %>% mutate(total = dropoffs + pickups)
 ```
 
 Let's have a look
