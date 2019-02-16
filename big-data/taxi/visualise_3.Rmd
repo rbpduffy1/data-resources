@@ -7,7 +7,7 @@ library(ggplot2)
 ```
 
 ### Challenge 9
-Read in the map shape file from https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+Read in the map shape file (taxi_zones.shp) from https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 ```{r}
 map <- st_read(___)
 ```
