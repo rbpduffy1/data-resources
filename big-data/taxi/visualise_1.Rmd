@@ -7,7 +7,7 @@ library(ggplot2)
 ```
 
 ### Challenge 9
-Read in the map shape file (taxi_zones.shp) from https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+Read in the map shape file (taxi_zones.shp) that you can download from https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 ```{r}
 map <- st_read(___)
 ```
@@ -18,7 +18,7 @@ plot(___)
 ```
 
 ### Challenge 10
-We need to append the map with our pickup and dropoff data
+We need to append the map with our pickdrops data
 ```{r}
 map <- append_data(map, ___)
 ```
