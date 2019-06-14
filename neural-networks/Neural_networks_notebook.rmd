@@ -60,11 +60,12 @@ What are the parameters you could tweak to get better results?
 ```{r}
 model <- keras_model_sequential() 
 model %>% 
-  layer_dense(units = ---, activation = 'relu', input_shape = length(colnames(x_test)), 
+  layer_dense(units = 4, activation = 'relu', input_shape = length(colnames(x_test)), 
               #length() would be the same with x_train
   kernel_initializer ='normal') %>% 
               #initial weights for the synapsie to be based on normal distribution
-  layer_dense(units = ---, activation = 'relu', kernel_initializer ='normal' ) %>%
+  layer_dense(units = 3, activation = 'relu', kernel_initializer ='normal' ) %>%
+    layer_dense(units = 10, activation = 'relu', kernel_initializer ='normal' ) %>%
   layer_dense(units = 1)
 summary(model)
 ```
@@ -89,7 +90,7 @@ history <- model %>% fit(
 # Let's see how our neural network performed
 ```{r}
 results <-  model %>% evaluate(x_test_scaled, y_test, batch_size = 10 , verbose = 0)
-paste0("mean absolute error on test set: $", sprintf("%.2f", results$mean_absolute_error ))
+paste0("mean squared error on test set: $", sprintf("%.2f", results$mean_squared_error ))
 ```
 
 # Having a look how well we did using a graph
