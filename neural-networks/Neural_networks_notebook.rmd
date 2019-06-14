@@ -1,0 +1,152 @@
+---
+title: "Neural Networks"
+output: html_notebook
+---
+# Load the libraries
+```{r}
+library(keras)
+library(tidyverse)
+library(tensorflow)
+library(MLmetrics)
+library(plotly)
+
+use_condaenv("r-tensorflow") #depending on Tensorflow and Keras versions, we may need to run this, try first without
+```
+
+# Load the data
+```{r}
+# find the data here (https://www.kaggle.com/harlfoxem/housesalesprediction)
+data <-  read_csv("home_data.csv")
+```
+
+# Let's have a look at our dataset
+```{r}
+summary(data)
+```
+
+# Dropping the variables we won't use in the analysis
+```{r}
+data <-  select(data, -c( 'date',  'zipcode', 'yr_built', 'condition','yr_renovated', 'lat', 'long', 'sqft_lot15'))
+summary(data)
+```
+
+# Creating training and testing datasets
+```{r}
+train <- sample_frac(data, size = 0.75)
+test <-  anti_join(data, train, by='id')
+```
+
+# Preparing the data for modeling and testing
+```{r}
+x_train <-  train %>% select(-c('id', 'price'))
+y_train <- train %>% select('price') %>% as.matrix()
+
+x_test <-  test %>% select(-c('id', 'price'))
+y_test <- test %>% select('price') %>% as.matrix()
+```
+
+# Scaling the data
+```{r}
+x_train_scaled <-  as.matrix(scale(x_train))
+x_test_scaled <-  as.matrix(scale(x_test, center=attr(x_train_scaled, "scaled:center"), 
+                                  scale=attr(x_train_scaled, "scaled:scale")))
+```
+
+# Modeling 
+Starting simple: let's make two layer neural network - both two thirds of the size of the number of the imput variables (general rule of thumb)
+How would you make it more complex?
+Including "layer_dropout(rate = 0.03)", would that improve your neural netowrk?
+What are the parameters you could tweak to get better results?
+```{r}
+model <- keras_model_sequential() 
+model %>% 
+  layer_dense(units = ---, activation = 'relu', input_shape = length(colnames(x_test)), 
+              #length() would be the same with x_train
+  kernel_initializer ='normal') %>% 
+              #initial weights for the synapsie to be based on normal distribution
+  layer_dense(units = ---, activation = 'relu', kernel_initializer ='normal' ) %>%
+  layer_dense(units = 1)
+summary(model)
+```
+
+# Setting up back propagation
+```{r}
+model %>% compile(
+  loss = 'mse', # mean squared error
+  optimizer = optimizer_adam(lr= 0.01), # what other optimizers could you use?
+  metrics = c('mse')
+)
+```
+
+# Train the model
+```{r}
+history <- model %>% fit(
+  x_train_scaled, y_train, 
+  epochs = 100, batch_size = 10
+)
+```
+
+# Let's see how our neural network performed
+```{r}
+results <-  model %>% evaluate(x_test_scaled, y_test, batch_size = 10 , verbose = 0)
+paste0("mean absolute error on test set: $", sprintf("%.2f", results$mean_absolute_error ))
+```
+
+# Having a look how well we did using a graph
+
+# Let's store out predictions in a variable
+```{r}
+predictions <-  predict(model, x_test_scaled)
+```
+
+We can visualise our resuts using "plot(y_test, predictions)" or produce a nicer graph using "ggplo2" and "plotly"
+```{r}
+p1 <- test %>%
+  ggplot(aes(y_test, predictions)) +
+  geom_point(alpha=0.5) +
+  stat_smooth(method = "lm") +
+  xlab('Actual price')+
+  ylab('Predicted price') +
+  theme_bw()
+ggplotly(p1)
+```
+
+
+
+# Let's compare our neural network to a linear model
+
+```{r}
+lm_data <- as.data.frame(cbind(y_train, x_train_scaled))
+```
+
+```{r}
+LM_model <- lm(price ~ ., data = lm_data)
+summary(LM_model)
+```
+
+# Mean squared error for the linear model
+```{r}
+x_test_scaled <- as.data.frame(x_test_scaled)
+
+predictions_LM <-  predict(LM_model, x_test_scaled)
+MSE(y_pred = predictions_LM, y_true = y_test)
+```
+
+```{r}
+p2 <- test %>%
+  ggplot(aes(y_test, predictions_LM)) +
+  geom_point(alpha=0.5) +
+  stat_smooth(method = "lm") +
+  xlab('Actual price')+
+  ylab('Predicted price') +
+  theme_bw()+
+  theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+subplot(p1, p2, shareX = TRUE, shareY = TRUE) %>% 
+layout(annotations = list(
+ list(x = 0.1 , y = 1.07,text = "Neural Network", showarrow = F, xref='paper', yref='paper'),
+  list(x = 0.8 , y = 1.07, text = "Linear Regression", showarrow = F, xref='paper',yref='paper'))
+)
+```
+
