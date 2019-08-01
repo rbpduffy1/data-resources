@@ -1,0 +1,405 @@
+---
+title: "TEXT ANALYSIS"
+output: html_notebook
+---
+
+# 1. First, as always, we need  to load the necessary libraries
+```{r}
+# install packages before loading
+#install.packages(c('tidytext','dplyr','textclean','ggplot2','reshape2','wordcloud', 'tm', 'textdata', 'tidyr', 'igraph', 'ggraph', 'widyr', 'topicmodels', dependencies=TRUE))
+#install.packages("xml2") # to get xml2 to load to install the tm package
+library(tidytext) 
+library(tm)       
+library(dplyr)     
+library(textclean) 
+library(ggplot2)   
+library(reshape2)  
+library(wordcloud) 
+library(textdata)
+library(tidyr)
+library(igraph)
+library(ggraph)
+library(widyr)
+library(topicmodels)
+```
+
+
+# 2. Now that we've loaded the libraries that we will need, we need to read the data into RStudio.
+## To use the Twitter data on Apple, download  the .csv from decd.co/apple-tweets
+```{r}
+# Ensure that strings (text) are not read as factors in R, but as characters. This is required for any text analysis we do later.
+
+# setwd("file path where your .csv file is located")
+
+
+# Use the View function to view the dataframe in another table
+
+
+# What are our columns?
+
+```
+
+# 3. Data Transformation
+
+```{r}
+# Text cleaning
+tweets$text <- tolower(tweets$text)
+tweets$text <- stripWhitespace(tweets$text)
+tweets$text <- ____(tweets$text) # remove url
+tweets$text <- ____(tweets$text) # removve html
+tweets$text <- removePunctuation(tweets$text, preserve_intra_word_contractions = FALSE, preserve_intra_word_dashes = TRUE, ucp = TRUE )
+tweets$text <- ____(tweets$text, ____) # removve stopwords
+```
+
+
+```{r}
+# How about we add more information to our text? Let's choose a column that's interesting to compare by
+____
+```
+
+
+
+# Tidy text format
+```{r}
+#in order to turn it into a tidy text dataset, we first need to put tweet text into a data frame.
+text_df <- tibble(line = as.numeric(rownames(tweets)), text=tweets$text, ____))
+
+text_df
+```
+
+```{r}
+# Within our tidy text framework, we need to both break the text into individual tokens (a process called tokenization) and transform it to a tidy data structure. To do this, we use tidytext’s unnest_tokens() function.
+text_tidy <- text_df %>%
+  unnest_tokens(word, text)
+```
+
+```{r}
+# Word frequencies
+text_tidy %>%
+  ____
+```
+
+
+```{r}
+# Or we can put them in a graph
+text_tidy %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 600) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+
+# Word cloud
+
+```{r}
+# Another way to represent most frequent words
+text_tidy %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100))
+```
+
+
+
+# Sentiment analysis
+ Let's start with a simple positive-negative sentiment first
+ 
+```{r}
+# bing lexicon does just that!
+____
+```
+ 
+
+```{r}
+# Sentiment and word counts
+bing_word_counts <- text_tidy %>%
+  inner_join(get_sentiments("bing")) %>% 
+  count(word, sentiment, sort = TRUE) %>%
+  ungroup()
+
+bing_word_counts
+```
+
+
+```{r}
+# We can also filter: just positive or just negative sentiment
+bing_negative <- get_sentiments("bing") %>% 
+  filter(sentiment == "negative") # or just positive
+
+text_tidy %>%
+  inner_join(bing_negative) %>%
+  count(word, sort = TRUE)
+```
+
+```{r}
+# Visualising sentiment frequencies
+
+bing_word_counts %>%
+  group_by(sentiment) %>%
+  top_n(10) %>%
+  ungroup() %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~sentiment, scales = "free_y") +
+  labs(y = "Contribution to sentiment",
+       x = NULL) +
+  coord_flip()
+```
+
+```{r}
+# Comparison cloud
+
+text_tidy %>%
+  #filter(verified==FALSE) %>%        # we can also filter verified/unverified accounts and see if that changes the sentiment
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(colors = c("gray20", "gray80"),
+                   max.words = 100)
+```
+
+# More complex  - emotions
+loughran - is a more complex lexicon that gives a wider 
+```{r}
+# other lexicons - more complex: emotions
+loughran_word_counts <- text_tidy %>%
+  inner_join(get_sentiments("loughran")) %>% 
+  count(word, sentiment, sort = TRUE) %>%
+  ungroup()
+
+loughran_word_counts
+```
+
+
+```{r}
+# We can filter this too!
+loughran_uncertainty <- get_sentiments("loughran") %>% 
+  filter(sentiment == "uncertainty")
+
+text_tidy %>%
+  inner_join(loughran_uncertainty) %>%
+  count(word, sort = TRUE)
+```
+
+```{r}
+# And visualise it
+loughran_word_counts %>%
+  group_by(sentiment) %>%
+  top_n(10) %>%
+  ungroup() %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~sentiment, scales = "free_y") +
+  labs(y = "Contribution to sentiment",
+       x = NULL) +
+  coord_flip()
+```
+
+```{r}
+# Even do a comparison cloud
+text_tidy %>%
+  inner_join(get_sentiments("loughran")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(title.size = 1, max.words = 100)
+```
+
+# Relationships between words: n-grams
+Are there two words that come next to each other often? can we grasp some meaning from that?
+
+```{r}
+# to create bigrams we go back to our text_df and create bigrams from tweets rather than single words
+text_bigrams <- text_df %>%
+  unnest_tokens(bigram, text, token = "ngrams", n = 2) %>% 
+  drop_na()
+
+text_bigrams
+```
+
+```{r}
+# most common bigrams
+text_bigrams %>%
+ ____
+```
+
+# Analysing bigrams
+
+```{r}
+# sometimes we may want to separate the bigrams to analyse them
+bigrams_separated <- text_bigrams %>%
+  separate(bigram, c("word1", "word2"), sep = " ")
+
+bigrams_separated
+```
+
+
+```{r}
+# what words appear next to a certain word - we can filter this information out 
+bigrams_separated %>%
+  filter(word2 == "bug") %>%  # or word1
+  count(word1, sort = TRUE)
+```
+
+```{r}
+# affin is a lexicon that gives a score to the words
+AFINN <- get_sentiments("afinn")
+
+AFINN
+```
+
+```{r}
+# let's have a look at the words around "bug", and visualise positive and negative ones
+
+bug_words1 <- bigrams_separated %>%
+  filter(word1 == "bug") %>% 
+  inner_join(AFINN, by = c(word2 = "word")) %>% 
+  select(line, word=word2, value)
+
+bug_words2 <- bigrams_separated %>%
+  filter(word2 == "bug") %>% 
+  inner_join(AFINN, by = c(word1 = "word")) %>% 
+  select(line, word=word1, value)
+
+bug_words <- rbind(bug_words1, bug_words2) %>% 
+  count(word, value, sort = TRUE)
+
+bug_words
+```
+
+```{r}
+# words that come before or after "bug"
+bug_words %>%
+  mutate(contribution = n * value) %>%
+  arrange(desc(abs(contribution))) %>%
+  head(20) %>%
+  mutate(word = reorder(word, contribution)) %>%
+  ggplot(aes(word, n * value, fill = n * value > 0)) +
+  geom_col(show.legend = FALSE) +
+  xlab("Words preceded or succeded by \"bug\"") +
+  ylab("Sentiment score * number of occurrences") +
+  coord_flip()
+```
+
+# Creating the bigram graphs
+```{r}
+# let's put the bigram counts into an object
+bigram_counts <- bigrams_separated %>% 
+  count(word1, word2, sort = TRUE)
+
+bigram_counts
+```
+
+```{r}
+# Let's create a graph (you'll more about this in Network Analysis)
+bigram_graph <- bigram_counts %>%
+  filter(n > 20) %>%
+  graph_from_data_frame()
+
+bigram_graph
+```
+
+
+```{r}
+# We can very quickly to visualise it!
+____
+
+ggraph(bigram_graph, layout = "fr") +
+  geom_edge_link() +
+  geom_node_point() +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1)
+```
+
+
+```{r}
+# or making it even prettier
+____
+
+a <- grid::arrow(type = "closed", length = unit(.15, "inches"))
+
+ggraph(bigram_graph, layout = "fr") +
+  geom_edge_link(aes(edge_alpha = n), show.legend = FALSE,
+                 arrow = a, end_cap = circle(.07, 'inches')) +
+  geom_node_point(color = "lightblue", size = 5) +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1) +
+  theme_void()
+```
+
+# Word correlations
+
+```{r}
+# count words co-occuring
+____
+```
+
+```{r}
+# Let's look at the word correlation
+word_cors <- text_tidy %>%
+  group_by(word) %>%
+  filter(n() >= 20) %>%
+  pairwise_cor(word, line, sort = TRUE)
+
+word_cors
+```
+
+```{r}
+# what words correlate with "bug"
+word_cors %>%
+  filter(item1 == "bug" | item2 == "bug")
+```
+
+```{r}
+# visualising correlations 
+word_cors %>%
+  filter(correlation > .4) %>% # we can choose the correlation level
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = correlation), show.legend = FALSE) +
+  geom_node_point(color = "lightblue", size = 5) +
+  geom_node_text(aes(label = name), repel = TRUE) +
+  theme_void()
+```
+
+# Topic modeling
+
+```{r}
+# for topic modeling we have to create a Document Term Matrix
+text_dtm <- text_tidy %>%
+  count(line, word, sort = TRUE) %>% 
+  cast_dtm(line, word, n)
+```
+
+
+```{r}
+# Let's create the topic model
+text_lda <- ____
+text_lda
+```
+
+```{r}
+# we can extract the relevvant information about the topics
+text_topics <- ____
+text_topics
+```
+
+
+```{r}
+#Let's have a look what these topics look like!
+
+text_top_terms <- text_topics %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  ungroup() %>%
+  arrange(topic, -beta)
+
+text_top_terms %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip()
+```
