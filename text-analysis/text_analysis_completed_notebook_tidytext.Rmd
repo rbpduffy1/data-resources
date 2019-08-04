@@ -39,11 +39,11 @@ tweets <- read.csv("apple-tweets.csv", stringsAsFactors = FALSE) # For windows m
 
 
 # Use the View function to view the dataframe in another table
-______
+View(tweets)
 
 
 # What are our columns?
-______
+colnames(tweets)
 
 ```
 
@@ -55,12 +55,12 @@ ______
 
 tweets$text <- tolower(tweets$text)
 tweets$text <- removePunctuation(tweets$text, preserve_intra_word_contractions = FALSE, preserve_intra_word_dashes = TRUE, ucp = TRUE)
-tweets$text <- ______(tweets$text, replacement = "")
-tweets$text <- ______(tweets$text) # remove url
-tweets$text <- ______(tweets$text) # removve html
+tweets$text <- replace_money(tweets$text, replacement = "")
+tweets$text <- replace_url(tweets$text) # remove url
+tweets$text <- replace_html(tweets$text) # removve html
 tweets$text <- removeWords(tweets$text, words = c(stopwords("english"), "apple")) # removve stopwords
-tweets$text <- ______(tweets$text, remove = TRUE)
-tweets$text <- ______(tweets$text, remove = TRUE)
+tweets$text <- replace_date(tweets$text, remove = TRUE)
+tweets$text <- replace_number(tweets$text, remove = TRUE)
 tweets$text <- gsub("[^\x01-\x7F]", "", tweets$text) # these three lines remove emojis, emoticons and words shorter than 2 letters
 tweets$text <- gsub('\\p{So}|\\p{Cn}', '', tweets$text, perl = TRUE)
 tweets$text <- gsub('\\b\\w{1,2}\\s','',tweets$text)# >2 letters
@@ -73,7 +73,7 @@ tweets$text <- removePunctuation(tweets$text, preserve_intra_word_contractions =
 
 ```{r}
 # How about we add more information to our text? Let's choose a column that's interesting to compare by
-______
+summary(as.factor(tweets$verified))
 ```
 
 
@@ -81,8 +81,9 @@ ______
 # Tidy text format
 ```{r}
 #in order to turn it into a tidy text dataset, we first need to put tweet text into a data frame.
+#language <- cldr::detectLanguage(tweets$text)
 
-text_df <- tibble(line = as.numeric(rownames(tweets)), text=tweets$text, ______)
+text_df <- tibble(line = as.numeric(rownames(tweets)), text=tweets$text, verified = as.factor(tweets$verified))
 
 text_df
 ```
@@ -97,7 +98,7 @@ text_tidy
 ```{r}
 # Word frequencies
 text_tidy %>%
-  ______
+  count(word, sort = TRUE)
 ```
 
 
@@ -130,7 +131,7 @@ text_tidy %>%
  
 ```{r}
 # bing lexicon does just that!
-______
+get_sentiments("bing")
 ```
  
 
@@ -196,8 +197,8 @@ Are there two words that come next to each other often? can we grasp some meanin
 ```{r}
 # to create bigrams we go back to our text_df and create bigrams from tweets rather than single words
 text_bigrams <- text_df %>%
-  ______
-  drop_na() # get NA biograms - doesn't come up with single words
+  unnest_tokens(bigram, text, token = "ngrams", n = 2) %>% 
+  drop_na()
 
 text_bigrams
 ```
@@ -247,7 +248,7 @@ bigram_graph
 
 ```{r}
 # We can very quickly to visualise it!
-______
+set.seed(2017)
 
 ggraph(bigram_graph, layout = "fr") +
   geom_edge_link() +
@@ -258,7 +259,7 @@ ggraph(bigram_graph, layout = "fr") +
 
 ```{r}
 # or making it even prettier
-______
+set.seed(2016)
 
 a <- grid::arrow(type = "closed", length = unit(.15, "inches"))
 
@@ -327,13 +328,13 @@ text_dtm <- text_tidy %>%
 
 ```{r}
 # Let's create the topic model
-text_lda <- ______
+text_lda <- LDA(text_dtm, k = 3, control = list(seed = 1234))
 text_lda
 ```
 
 ```{r}
 # we can extract the relevvant information about the topics
-text_topics <- ______
+text_topics <- tidy(text_lda, matrix = "beta")
 text_topics
 
 # we still get a couple of rogue b-s even after data cleaning...
