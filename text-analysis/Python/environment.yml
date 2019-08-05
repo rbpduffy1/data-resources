@@ -1,0 +1,12 @@
+name: decoded-text-analysis
+dependencies:
+  - pandas
+  - numpy
+  - seaborn
+  - matplotlib
+  - wordcloud
+  - scipy
+  - scikit-learn
+  - python-graphviz
+  - nltk
+  - textblob
