@@ -1,0 +1,343 @@
+---
+title: 'Stats in R'
+output: html_notebook
+---
+# Hypothesis testing and statistical analysis
+So far we have explored how to load, clean and summarise data in Python. In this module, we are going to learn how to test hypotheses using several methods.
+
+**Brief**
+
+Did Apple Store apps receive better reviews than Google Play apps?
+
+## The challenges of the workshop are:
+
+1. Clean the two data sets
+    * Load the two data sets
+    * Pick the columns that we are going to work with 
+    * Check the data types and fix them
+    * Create a column called platform whose values are 'apple' or 'google'
+2. Join the two data sets
+    * To do that use the function `bind_rows`
+    * Eliminate the `NaN` values
+    * Only use the apps which contain reviews
+3. Summarise the data visually and analytically (by the column `platform`)
+    * Use the function summary()
+    * Use a boxplot
+4. Test the following hypothesis 'The differences in the average ratings of apple and google users are due to chance and not due to differences in the platforms' 
+    * Let’s use traditional methods: parametric and non-parametric
+    * Let’s use permutations
+
+As you are going to see, the first steps of every single data analysis are loading and cleaning the data. Today is not an exception, so that is going to be our first step.
+## Importing the libraries
+
+In this case, we are going to use the packages ggplot2, tidyr, dplyr, stringr, readr and nortest.
+```{r}
+library(ggplot2) # For visualisation
+library(tidyr) # To tidy the data
+library(dplyr) # To manipulate the data frames
+library(stringr) # To manipulate non-numerical data
+library(readr) # To read data :)
+library(nortest) # To test the normality of the data
+```
+## Challenge 1 -  Loading and cleaning data
+### Load data
+Load the data from the folder Stats in your Desktop, this data is from the website Kaggle. Kaggle is an extraordinary repository of data and good fun data competitions. The data from the Apple Store can be found [here](https://www.kaggle.com/ramamet4/app-store-apple-data-set-10k-apps) and the data from Google Store can be found [here](https://www.kaggle.com/lava18/google-play-store-apps).
+
+```{r}
+# Once the file `googleplaystore.csv` is saved, we need to load it into R using read_csv
+# Use the function read_csv() to read the file, inside that function add the path of the file 
+Google <- read_csv('googleplaystore.csv')
+# Let's observe the first seven entries
+head(Google,7)
+```
+
+```{r}
+# Once the file `googleplaystore.csv` is saved, we need to load it into R using read_csv
+# Use the function read_csv() to read the file, inside that function add the path of the file 
+Apple <-  read_csv('AppleStore.csv')
+# Let's observe the first seven entries
+head(Apple,7)
+```
+Based on the documentation of both data sets, the most adequate columns to answer the brief are:
+
+1. For Google:
+    * `Category` # Do we need this?
+    * `Rating`
+    * `Reviews`
+    * `Price` (maybe)
+2. For Apple:    
+    * `prime_genre` # Do we need this?
+    * `user_rating` 
+    * `rating_count_tot`
+    * `price` (maybe)
+    
+### Subsetting
+Let's select the columns that we want for both data sets.
+
+Overwrite the subsets in the original variables.    
+```{r}
+# Let's subset the dataframe Apple by only selecting the variables c('prime_genre', 'user_rating', 'rating_count_tot', 'price')
+Apple <-  Apple[c('prime_genre', 'user_rating', 'rating_count_tot', 'price')]
+# Let's check the first three entries
+head(Apple)
+```
+
+```{r}
+# Let's subset the dataframe Google by only selecting the variables c('Category', 'Rating', 'Reviews', 'Price')
+Google <-  Google[c('Category', 'Rating', 'Reviews', 'Price')]
+# Let's check the first three entries
+head(Google,3)
+```
+
+### Checking data types for both Apple and Google
+In this part let's figure out whether the variables that we selected contain errors/mistakes in the expected datatype.
+
+```{r}
+# Use the function glimpse
+## Check out the data types of the data frame Apple. Are the data types expected?
+glimpse(Apple)
+```
+As you can see all the data types of `Apple` are expected. What about the data types of `Google`?
+```{r}
+# Check out the data types of the data frame Google. Are the data types expected?
+glimpse(Google)
+```
+Are the data types expected?
+Check out the unique values of the column Price in the data set Google
+```{r}
+# Use the function unique() to the column Price in the data set Google
+unique(Google$Price)
+```
+Interesting... There is a price called `Everyone`. That is a massive mistake. Let's check the data points that have the price value as `Everyone`.
+```{r}
+# Let's check what is the data point which contains the price 'Everyone' using a subset of Google.
+## Subset by the column Price that equals to `Everyone`.
+filter(Google, Price== 'Everyone')
+```
+Now it is time to eliminate that observation. 
+```{r}
+# Let's eliminate that point because it has the wrong information.
+## To do that, subset Google but instead of using '==, is equal to' use 'is different from' which is '!='.
+Google <-  filter(Google, Price != 'Everyone')
+### Check again the unique values of Price
+unique(Google$Price)
+```
+Let's check the data types of Google.
+```{r}
+# Check-out the datatypes of Google
+glimpse(Google)
+```
+Now the problem is that the prices contain the symbol `$`. Therefore for R, these values are still considered `str` elements and not numbers! So let's eliminate the dollar symbol and convert the column into a numeric data type.
+
+1. Change the dollar symbol 
+```{r}
+# Use the function sapply to each element of Google$Price, apply to each element the function str_replace
+## Use pattern = '\\$', replacement= ''
+Google$Price <-  sapply(Google$Price, str_replace, pattern = '\\$', replacement= '')
+unique(Google$Price)
+```
+2. Make the whole column a numerical column
+```{r}
+# Apply as.numeric() to Google$Price, save it as the Price column in Google
+Google$Price <- as.numeric(Google$Price)
+# Let's have a glimpse of Google data types
+glimpse(Google)
+```
+The column `Reviews` is still an object column, we need that column to be a numeric column.
+```{r}
+# Transform the column `Reviews` to numeric using the functions as.numeric
+Google$Reviews <- as.numeric(Google$Reviews)
+```
+Now let's have a glimpse of the data
+```{r}
+# Let's check the data types of Google again
+glimpse(Google)
+```
+### New columns for `Apple` and `Google` called `platform`
+Let's create a new column called `platform` where the value for the Apple dataframe is 'apple', and for Google is 'google'
+
+```{r}
+# Let's create the column platform in Apple, which all values are 'apple'
+Apple$platform = 'apple'
+head(Apple)
+```
+
+```{r}
+# Let's create the column platform in Google, which all values are 'google'
+Google$platform = 'google'
+head(Google)
+```
+### Changing the column names to unify the two data sets
+Now we need to rename the variables of `Apple` to be the same as `Google` or vice versa.
+In this case, we are going to change the `Apple` column names to the names of `Google` columns.
+
+This is an important step to unify the two data sets.
+```{r}
+# Changing the column names of Apple with the columns names of Google
+colnames(Apple) <-  colnames(Google)
+```
+Let's check  the column names of Apple
+```{r}
+colnames(Apple)
+```
+## Challenge 2 -  Combine the two data sets
+Combine the two data sets into a single data frame called `df`
+```{r}
+# Combine the data sets using the function 'bind_rows'
+# The arguments of that function are the two data sets that you want to combine
+df <- bind_rows(Google,Apple)
+#Let's check how the data points are concatenated 
+sample_n(df, 10)
+```
+As you can see there are some `NaN` values, eliminate all the `NaN` values from the table
+```{r}
+# Let's check first the dimensions of df before dropping `NaN` values
+print(dim(df))
+# Use the function .dropna to eliminate all the NaN values, overwrite in the same dataframe
+df <- drop_na(df)
+# Check the dimensions of df
+print(dim(df))
+```
+Now let's check how many apps have 0 reviews.
+```{r}
+# To check how many apps have 0 reviews we are going to use the function dim of the subset of df where Reviews == 0
+dim(filter(df, Reviews == 0))
+```
+929 apps do not have reviews, we need to eliminate these points!
+```{r}
+# Eliminate the points that have 0 reviews by subsetting df using the expression 'different from' !=
+# Overwrite that variable
+df <-  filter(df, Reviews != 0)
+summary(df)
+```
+## Challenge 3 -  Summarise the data visually and analytically (by the column `platform`)
+### Analytical summary
+We need a summary of the column `Rating` but separated by the different platforms
+```{r}
+# Let's group by using the function 'group_by', grouping by the platform. Save it as gdf.
+gdf <- group_by(df, platform)
+# Let's use the function summarise, calculating the following metrics of Rating: mean, standard deviation, variance, and total observations  
+summarise(gdf, mean_Rating = mean(Rating), std_Rating = sd(Rating), variance = var(Rating), count = length(Rating) )
+```
+### Visual summary
+We need a summary of the column `Rating` but separated by the different platforms, let's use a boxplot!
+```{r}
+# Use a ggplot to visulalise the differences between platforms and Rating
+ggplot(df) + geom_boxplot(aes(x = platform, y = Rating))
+```
+
+## Challenge 4 -  Test whether there are significant differences between Apple and Google reviews
+The first step to test a hypothesis is to define the hypothesis that you want to test. For that reason, your task here is to provide a null and an alternative hypothesis to complete the brief.
+
+H<sub>null</sub>:
+
+H<sub>alternative</sub>:
+
+The second step is to determine the significance level.
+
+SL: 
+
+Now that the hypotheses are defined, and also the significance level, we are going to try to reject or accept the null hypothesis.
+
+```{r}
+# Let's create a subset of the column 'Rating' by the different platforms. 
+## Call the subsets 'apple' and 'google' 
+apple <- filter(df, platform == 'apple')
+apple <-  as.vector(apple$Rating)
+google <- filter(df, platform == 'google')
+google <-  as.vector(google$Rating)
+obs_diff  <-  mean(apple) - mean(google)
+obs_diff
+```
+### Permutations 
+
+Permutations and bootstrapping are the ultimate techniques to test differences between groups. The extraordinary power lies
+in the fact that there are no previous assumptions, therefore it is very easy to apply to any problem.  
+Check out more about permutations [here](http://rasbt.github.io/mlxtend/user_guide/evaluate/permutation_test/)
+
+```{r}
+#Permutation test 
+permlength = 100 # this is the number of iterations that we are going to permute
+diff_mean= vector(length = length(permlength)) # This is an empty vector where we are going to store the mean differences 
+total <- c(apple,google)
+for (i in 1:permlength) ## This is the iterations
+{
+  ind_A <-  sample.int(length(total), size = length(apple), replace = FALSE)
+  prm_apple <-  total[ind_A]
+  prm_google <- total[-ind_A]
+  diff_mean[i] = mean(prm_google) - mean(prm_apple) 
+}
+```
+Now let's have a look of the null distribution
+```{r}
+null_dist <-  as.data.frame(diff_mean)
+ggplot(null_dist)+geom_histogram(aes(diff_mean))
+```
+Now time to calculate the p-value associated to our observation!
+We observed an average difference of -0.1420605
+```{r}
+#How many observations are more negative than -0.1420605
+more_negative <-  length(diff_mean[diff_mean < obs_diff])
+p_value <- more_negative/permlength
+p_value
+```
+
+## Traditional tests 
+[Student's t-test](https://en.wikipedia.org/wiki/Student%27s_t-test#Independent_two-sample_t-test) helps to evaluate differences between two independent groups. Run a Student's t-test to compare the differences between Apple and Google reviews.
+
+If you are going to use traditional methods check:
+
+1. Your data is normally distributed
+
+2. Your variances are equal
+
+For pedagogical purposes we are going to show you how to implement each method, however, the results are not correct if your data do not fulfil the assumptions for each test.
+
+## Student's t-test
+Let's use a Student's t-test to check if there are differences between the app reviews left by Apple and Google, to do that we are going to use the function t.test
+
+```{r}
+# Use the function t.test, in the parameters type apple and google, also the parameter var.equal to TRUE
+t.test(apple, google, var.equal = TRUE)
+```
+Is that the right test? As you can see R is not going to tell you if your data fit the assumptions of the test. We need to test that and select the most adequate test.
+
+Let's check the equal variance assumption 
+
+```{r}
+var(apple)
+var(google)
+```
+Wow! there are quite different! Maybe we cannot assume that the variances of both groups are equal! 
+You can also run a test to verify whether there are significant differences.
+
+Student's t-test has very strong assumptions that we probably overlooked. Could you write down the assumptions of the Student's t-test? You can find them [here](https://en.wikipedia.org/wiki/Student%27s_t-test#Independent_two-sample_t-test) 
+
+As you can see Student's t-test assumes that the variances between groups are equal. This is not the case (check the analytical summary), we can still use Welch’s t-test using the same function that we used before.
+```{r}
+# To run a Welch test 
+t.test(apple, google, var.equal = FALSE)
+```
+Both tests (Student's t-test and Welch’s t-test) assume that the data is normally distributed, we can test that looking at the distribution or using the function ad.test (Anderson-Darling normality test)
+```{r}
+hist(apple)
+```
+
+```{r}
+hist(google)
+```
+Alternatively, we can test if the data are normally distributed using an Anderson-Darling normality test. The null hypothesis in this test is that the data is normally distributed.
+```{r}
+print('Apple normality test')
+print(ad.test(apple))
+print('Google normality test')
+print(ad.test(google))
+```
+Finally, we can use a Mann-Whitney U test is the data is not normally distributed.
+```{r}
+wilcox.test(apple, google)
+```
+
+What can you conclude about our initial hypothesis?
+
+
