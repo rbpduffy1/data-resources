@@ -1,0 +1,236 @@
+---
+title: "Coding Kata, Solutions"
+output: html_notebook
+---
+
+
+A coding kata is a short exercise to help practice programming skills in short bursts.
+
+Get started programming in R using these katas below.
+
+Your best resources to help you solve these challenges will be Google, StackOverflow and the official R documentation.
+
+
+# Kata #0 
+
+## Opposite number
+
+Very simple, given a number, find its opposite.
+
+Examples:<br/>
+1: -1 <br/>
+14: -14 <br/>
+-34: 34 <br/>
+But can you do it in 1 line of code and without any conditionals?
+
+Try solving this challenge by modifying the code block below.
+
+```{r}
+opposite <- function(number) {
+  return(-number);
+}
+```
+
+Tests for Kata #0: <br/>
+The code blocks below should execute properly once you have written the code above.
+
+
+```{r}
+# Test Case 1: opposite(1)
+print('Expected output: -1')
+print(paste('Your function outputs ', toString(opposite(1))))
+```
+
+```{r}
+# Test Case 2: opposite(-10)
+print('Expected output: 10')
+print(paste('Your function outputs ', toString(opposite(-10))))
+```
+
+```{r}
+# Test Case 2: opposite(392)
+print('Expected output: -392')
+print(paste('Your function outputs ', toString(opposite(392))))
+```
+
+# Kata #1 
+
+## Find Smallest Integer in the Vector 
+
+Very simple, given a vector of integers, find the smallest number in it.
+
+Given [34, 15, 88, 2], your solution will return 2.<br/> Given [34, -345, -1, 100], your solution will return -345. <br/>You can assume, for the purpose of this kata, that the supplied array will not be empty.
+
+Try solving this challenge by modifying the code block below.
+
+```{r}
+find_smallest_int <- function(vec) {
+  return(min(vec));
+}
+```
+
+Tests for Kata #1
+The code blocks below should execute properly once you have written the code above.
+
+```{r}
+# Test Case 1: 
+a <- c(78, 56, 232, 12, 11, 43)
+print('Expected output: 11')
+print(paste('Your function outputs: ', toString(find_smallest_int(a))))
+```
+```{r}
+# Test Case 2: 
+a <- c(78, 56, -2, 12, 8, -33)
+print('Expected output: -33')
+print(paste('Your function outputs: ', toString(find_smallest_int(a))))
+```
+```{r}
+# Test Case 3: 
+a <- c(0, 1-2**64, 2**64)
+print('Expected output: -18446744073709551616')
+print(paste('Your function outputs: ', toString(find_smallest_int(a))))
+```
+
+
+
+# Kata #2
+
+## Even or Odd
+Create a function that takes an integer as an argument and returns "Even" for even numbers or "Odd" for odd numbers.
+
+Code
+Try solving this challenge by modifying the code block below.
+
+```{r}
+even_or_odd <- function(number) {
+  if ((number %% 2) == 0){
+    return("Even");
+  }
+  else {
+    return("Odd");
+  }
+}
+```
+
+Tests for Kata #2
+The code blocks below should execute properly once you have written the code above.
+
+```{r}
+# Test Case 1: even_or_odd(2)
+print('Expected output: Even')
+print(paste('Your function outputs:', even_or_odd(2)))
+```
+
+```{r}
+# Test Case 2: even_or_odd(7)
+print('Expected output: Odd')
+print(paste('Your function outputs:', even_or_odd(7)))
+```
+
+```{r}
+# Test Case 3: even_or_odd(0)
+print('Expected output: Even')
+print(paste('Your function outputs:', even_or_odd(0)))
+```
+
+```{r}
+# Test Case 4: even_or_odd(1)
+print('Expected output: Odd')
+print(paste('Your function outputs:', even_or_odd(1)))
+```
+
+
+# Kata #3
+
+## String Repeat
+Write a function called repeatStr which repeats the given string string exactly n times.
+e.g:<br/>
+repeatStr(6, "I") // "IIIIII"<br/>
+repeatStr(5, "Hello") // "HelloHelloHelloHelloHello"<br/>
+
+Try solving this challenge by modifying the code block below.
+
+```{r}
+repeat_str <- function(n, str) {
+  return(paste(replicate(n, str), collapse = ""));
+}
+```
+
+Tests for Kata #3
+The code blocks below should execute properly once you have written the code above.
+
+```{r}
+# Test Case 1: repeat_str(4, "a")
+print('Expected output: aaaa')
+print(paste('Your function outputs:', repeat_str(4, "a")))
+```
+
+```{r}
+# Test Case 2: repeat_str(3, "hello")
+print('Expected output: hellohellohello')
+print(paste('Your function outputs:', repeat_str(3, "hello")))
+```
+
+```{r}
+# Test Case 3: repeat_str(2, "abc")
+print('Expected output: abcabc')
+print(paste('Your function outputs:', repeat_str(2, "abc")))
+```
+
+# Kata #4
+
+## Century From Year
+Introduction The first century spans from the year 1 up to and including the year 100, The second - from the year 101 up to and including the year 200, etc.<br/>
+
+Task Given a year, return the century it is in.<br/>
+
+Input, Output Examples<br/>
+
+century(1705)  # returns 18<br/>
+century(1900)  # returns 19<br/>
+century(1601)  # returns 17<br/>
+century(2000)  # returns 20<br/>
+
+Try solving this challenge by modifying the code below.<br/>
+
+```{r}
+centuryFromYear <- function(year) {
+  return(ceiling(year/100));
+}
+```
+
+Tests for Kata #4
+The code blocks below should execute properly once you have written the code above.
+
+```{r}
+# Test Case 1: century(1705)
+print('Expected output: 18')
+print(paste('Your function outputs:', centuryFromYear(1705)))
+```
+
+```{r}
+# Test Case 2: century(1900)
+print('Expected output: 19')
+print(paste('Your function outputs:', centuryFromYear(1900)))
+```
+
+```{r}
+# Test Case 3: century(1601)
+print('Expected output: 17')
+print(paste('Your function outputs:', centuryFromYear(1601)))
+```
+
+```{r}
+# Test Case 4: century(2000)
+print('Expected output: 20')
+print(paste('Your function outputs:', centuryFromYear(2000)))
+```
+
+
+
+
+
+
+
+
+
