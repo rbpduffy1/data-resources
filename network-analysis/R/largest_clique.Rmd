@@ -1,0 +1,14 @@
+```{r}
+# Assign largest cliques output to object 'lc'
+lc <- largest_cliques(g)
+# Create a new subgraphs, each containing only the vertices of each largest clique.
+gs1 <- induced_subgraph(g, lc[[1]])
+plot(gs1,
+     vertex.label.color = "black", 
+     vertex.label.cex = 0.9,
+     vertex.size = 0,
+     edge.color = 'gray28',
+     main = "Network of Largest Clique at Enron",
+     layout = layout.circle(gs1)
+)
+```

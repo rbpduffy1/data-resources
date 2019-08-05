@@ -1,0 +1,13 @@
+```{r}
+g <- set_vertex_attr(g, "color", value = 'cornflowerblue')
+# Create numerical vector of various centrality measures --  betweenness, eignecentrality, and pagerank.
+centrality1 <- as.numeric(betweenness(g))
+centrality2 <- as.numeric(eigen_centrality(g)$vector)
+centrality3 <- as.numeric(page_rank(g)$vector)
+# Create the respective vectors
+vector1 <- 0.022*sqrt(centrality1)
+vector2 <- 2*sqrt(centrality2)
+vector3 <- 2*sqrt(centrality3)
+# Plot threejs plot of graph setting vertex size to the vector specified above
+(graphjs(g, vertex.size = vector2, vertex.label = V(g)$name, brush = TRUE))
+```
