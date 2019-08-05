@@ -3,39 +3,43 @@ title: "TEXT ANALYSIS"
 output: html_notebook
 ---
 
-This notebook is a replication of this e-book: https://www.tidytextmining.com/. There's little to no different analysis than what comes in this guide. Reason being that because text is a very specific data and the intro to basics will always be the same - any time we analise text data (twitter, blogs, magazines, facebook, surveys, interviews etc.) the starting point/basic analysis will always be the same. I chose to use tidytext because it's much more flexible than traditional bag-of-words approach.
+This notebook is a replication of this e-book: https://www.tidytextmining.com/. There's little to no different analysis than what comes in this guide. Reason being that because text is a very specific data and the intro to basics will always be the same - any time we analyse text data (twitter, blogs, magazines, facebook, surveys, interviews etc.) the starting point/basic analysis will always be the same. I chose to use tidytext because it's much more flexible than traditional bag-of-words approach.
 
 
 # 1. First, as always, we need  to load the necessary libraries
 ```{r}
 # install packages before loading
-# I wuld ask the learners to run this before the session
-#install.packages(c('tidytext','dplyr','textclean','ggplot2','reshape2','wordcloud', 'tm', 'textdata', 'tidyr', 'igraph', 'ggraph', 'widyr', 'topicmodels', dependencies=TRUE))
-#install.packages("xml2") # to get xml2 to load to install the tm package
+   # I would ask the learners to run this before the session
+install.packages(c('tidytext','dplyr','textclean','ggplot2','reshape2','wordcloud', 'tm', 'textdata', 'tidyr', 'igraph', 'ggraph', 'widyr', 'topicmodels', dependencies=TRUE))
 
-library(tidytext) 
-library(tm)       
-library(dplyr)     
-library(textclean) 
-library(ggplot2)   
-library(reshape2)  
-library(wordcloud) 
-library(textdata)
-library(tidyr)
-library(igraph)
-library(ggraph)
-library(widyr)
-library(topicmodels)
+# if having issues installling the tm package, install xml2 first, then retry "tm" package
+   # install.packages("xml2") 
+
+
+library(tidytext)      # for text mining (using dplyer, ggplot2, & other Tidy tools)
+library(tm)            # package for text mining
+library(dplyr)         # for data manipulation 
+library(textclean)     # for cleaning text data
+library(ggplot2)       # for making nicer graphs/visualis 
+library(reshape2)      # for reshaping data (e.g., tweets into individual words) 
+library(wordcloud)     # for making word clouds (with text data) 
+library(textdata)      # for loading different text datasets
+library(tidyr)         # for easily tidying data 
+library(igraph)        # for network analysis/visualisation (e.g., network of word pairs)
+library(ggraph)        # for graphing/visualising networks 
+library(widyr)         # for pairwise word correlations 
+library(topicmodels)   # for topic modelling
 ```
 
 
 # 2. Now that we've loaded the libraries that we will need, we need to read the data into RStudio.
-## To use the Twitter data on Apple, download  the .csv from decd.co/data-helpers "Data" folder, "Text analysis" folder contains the notebooks
+## To use the Twitter data on Apple, download the .csv from decd.co/data-resources "Datasets" folder
+## "Text analysis" folder contains the notebooks (completed and semi-completed)
 ```{r}
 # Ensure that strings (text) are not read as factors in R, but as characters. This is required for any text analysis we do later.
 
 # setwd("file path where your .csv file is located")
-tweets <- read.csv("apple-tweets.csv", stringsAsFactors = FALSE) # For windows machines add:encoding = "UTF-8",  otehrwise the data imports with mistakes/weird characters
+tweets <- read.csv("apple_tweets - apple_tweets.csv", stringsAsFactors = FALSE) # For windows machines add:encoding = "UTF-8",  otehrwise the data imports with mistakes/weird characters
 
 
 # Use the View function to view the dataframe in another table
@@ -48,93 +52,125 @@ colnames(tweets)
 ```
 
 # 3. Data Transformation
-
 ```{r}
 # Text cleaning
 # if we start with cleaning text column before extracting it from the dataset for the analysis it's easier to go back and add other columns of interest to the analysis
 
 tweets$text <- tolower(tweets$text)
-tweets$text <- removePunctuation(tweets$text, preserve_intra_word_contractions = FALSE, preserve_intra_word_dashes = TRUE, ucp = TRUE)
+tweets$text <- removePunctuation(tweets$text, preserve_intra_word_contractions =                FALSE, preserve_intra_word_dashes = TRUE, ucp = TRUE) 
+    # remove punctuation, UCP=TRUE is to tell computer that there are ascii and non-ascii punctuation symbols
+
 tweets$text <- replace_money(tweets$text, replacement = "")
 tweets$text <- replace_url(tweets$text) # remove url
 tweets$text <- replace_html(tweets$text) # removve html
-tweets$text <- removeWords(tweets$text, words = c(stopwords("english"), "apple")) # removve stopwords
-tweets$text <- replace_date(tweets$text, remove = TRUE)
-tweets$text <- replace_number(tweets$text, remove = TRUE)
-tweets$text <- gsub("[^\x01-\x7F]", "", tweets$text) # these three lines remove emojis, emoticons and words shorter than 2 letters
+tweets$text <- removeWords(tweets$text, words = c(stopwords("english"),"apple"))
+                # remove stopwords
+tweets$text <- replace_date(tweets$text, remove = TRUE)  # remove dates
+tweets$text <- replace_number(tweets$text, remove = TRUE) # remove numbers
+
+# the next three lines remove emojis, emoticons and words shorter than 2 letters
+tweets$text <- gsub("[^\x01-\x7F]", "", tweets$text) 
 tweets$text <- gsub('\\p{So}|\\p{Cn}', '', tweets$text, perl = TRUE)
-tweets$text <- gsub('\\b\\w{1,2}\\s','',tweets$text)# >2 letters
-tweets$text <- stripWhitespace(tweets$text)
-tweets$text <- removePunctuation(tweets$text, preserve_intra_word_contractions = FALSE, preserve_intra_word_dashes = TRUE, ucp = TRUE) # removePunctuation has to be run twice because some of the functions above will "release" punctuation 
-# cleaning functions may be run out of sequence - going back to them if we se something odd in the text and adding others when need
+tweets$text <- gsub('\\b\\w{1,2}\\s','',tweets$text) # >2 letters
+
+tweets$text <- stripWhitespace(tweets$text) # removes any excess white spaces (more than 1 space)
+
+tweets$text <- removePunctuation(tweets$text, preserve_intra_word_contractions = FALSE, preserve_intra_word_dashes = TRUE, ucp = TRUE) 
+      # removePunctuation has to be run twice because some of the functions above will "release" punctuation 
+     
+
+# NOTE: cleaning functions may be run out of sequence - going back to them if we se something odd in the text and adding others when need
 ```
 
-
-
 ```{r}
-# How about we add more information to our text? Let's choose a column that's interesting to compare by
+# How about we add more information to our text? Let's choose a column that's interesting to compare by, like "verification"
+
+# seeing the number of tweets from verified vs non-verified accounts
 summary(as.factor(tweets$verified))
 ```
 
-
-
-# Tidy text format
+# 4. Tidy text format
 ```{r}
 #in order to turn it into a tidy text dataset, we first need to put tweet text into a data frame.
-#language <- cldr::detectLanguage(tweets$text)
 
 text_df <- tibble(line = as.numeric(rownames(tweets)), text=tweets$text, verified = as.factor(tweets$verified))
 
 text_df
+
+# if there are instances where texts are in all different languages you can use a package that identifies and defines the langauge of every document (i.e., tweet, sentence, etc.) in the dataset
+   # you would then use this new dataframe (with identified languages) to define the language of the texts you want to use in the dataframe code above(text_df lines)
+   # use the following code below to detect the language:
+    
+### language <- cldr::detectLanguage(tweets$text) ###
+
+         # CLDR returns a dataframe that contains all the documents (ie, individual tweets)
+         # textcat returns a vector of character strings with the name of the language for each document (ie, individual tweets)
+   
+
 ```
 
 ```{r}
-# Within our tidy text framework, we need to both break the text into individual tokens (a process called tokenization) and transform it to a tidy data structure. To do this, we use tidytext’s unnest_tokens() function.
+# Within our tidy text framework, we need to both break the text into individual tokens (a process called tokenization) and transform it to a tidy data structure. To do this, we use tidytext’s "unnest_tokens()" function.
+
 text_tidy <- text_df %>%
   unnest_tokens(word, text)
 text_tidy
 ```
 
 ```{r}
-# Word frequencies
+# Getting the word frequencies from the new text dataframe 
 text_tidy %>%
   count(word, sort = TRUE)
 ```
 
-
 ```{r}
 # Or we can put them in a graph
 text_tidy %>%
-  count(word, sort = TRUE) %>%
-  filter(n > 600) %>%
-  mutate(word = reorder(word, n)) %>%
-  ggplot(aes(word, n)) +
-  geom_col() +
+  count(word, sort = TRUE) %>%          # want to get a count of words
+  filter(n > 500) %>%                   # filter for words appearing more than certain # of times
+  mutate(word = reorder(word, n)) %>%   # order most freq words first
+  ggplot(aes(word, n)) +                # plotting words in order of freq
+  geom_col(fill="lightgreen") +          # for adding colors
   xlab(NULL) +
-  coord_flip()
+  coord_flip() +
+  theme_classic() # in-build graph themes; click tab to see the list of options for themes
 ```
 
 
-# Word cloud
-
+# 5. Visualisation: Word cloud
 ```{r}
 # Another way to represent most frequent words
+
 text_tidy %>%
   count(word) %>%
-  with(wordcloud(word, n, max.words = 100))
+  with(wordcloud(word, n, max.words = 100, # specify # of words using max.words
+                 scale=c(3.0,0.5),         # rescale wordcloud to fit everything if needed
+                 col=hcl.colors(10, palette = "red-blue") # colours using "palette" from "graphics"
+                 )) 
+
+
+
+# for more wordcloud ideas, see this link (wordcloud2 package) and run the following code:
+# https://cran.r-project.org/web/packages/wordcloud2/vignettes/wordcloud.html
+   # require(devtools)
+   # install_github("lchiffon/wordcloud2")
+
+
+# for more palette colours for nicer visuals (using HCL palettes) you need to get "graphics" by running the following code:
+   # require("graphics")
+
+
+# information on premade HCL palettes: http://colorspace.r-forge.r-project.org/articles/hcl_palettes.html
 ```
 
 
-
-# Sentiment analysis
+# 6. Visualisation: Sentiment analysis
  Let's start with a simple positive-negative sentiment first
- 
 ```{r}
 # bing lexicon does just that!
 get_sentiments("bing")
 ```
  
-
 ```{r}
 # Sentiment and word counts
 bing_word_counts <- text_tidy %>%
@@ -145,11 +181,10 @@ bing_word_counts <- text_tidy %>%
 bing_word_counts
 ```
 
-
 ```{r}
 # We can also filter: just positive or just negative sentiment
 bing_negative <- get_sentiments("bing") %>% 
-  filter(sentiment == "negative") # or just positive
+  filter(sentiment == "negative") # or sentiment == "positive" 
 
 text_tidy %>%
   inner_join(bing_negative) %>%
@@ -164,74 +199,91 @@ bing_word_counts %>%
   top_n(10) %>%
   ungroup() %>%
   mutate(word = reorder(word, n)) %>%
+  # mutate(n = ifelse(sentiment == "negative", -n, n)) %>%   # include this to have positive and negative values go in opposite directions 
   ggplot(aes(word, n, fill = sentiment)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~sentiment, scales = "free_y") +
   labs(y = "Contribution to sentiment",
        x = NULL) +
-  coord_flip()
+  coord_flip() +
+  theme_minimal() 
 ```
 
 ```{r}
-# Comparison cloud
+# Comparison cloud: wordclouds with words grouped by sentiment 
 
 text_tidy %>%
   #filter(verified==TRUE) %>%   # we can filter by if the account is veried or not to see if there's a difference in language used (a lot of unverified accounts are bots)
   inner_join(get_sentiments("bing")) %>%
   count(word, sentiment, sort = TRUE) %>%
   acast(word ~ sentiment, value.var = "n", fill = 0) %>%
-  comparison.cloud(colors = c("gray20", "gray80"),
-                   max.words = 100)
+  comparison.cloud(colors = c("purple", "hotpink"), max.words = 100) 
+         # top/negative = 1st colour; bottom/positive=2nd colour
+
 ```
 
-# More complex  - emotions
-loughran - is a more complex lexicon that gives a wider range of dimentions 
-NRC  -  5 emotional dimentions (similart ot what IBM Watson does) - code same as for bing, just replace
-Afinn - assigns a sentiment score from -5 (very negative) to +5 (very positive)
 
-NOTE: LEXICONS OTHER THAN BING ARE VERY FINNICKY - THEY MAY OR MAY NOT WORK ON DIFFERENT MACHINES - I AM LOOKING INTO IT, BUT DON'T HAVE A READY SOLUTION. MY ADVICE WOULD BE TO JUST USE BING AND MENTION THE OTHERS AND MOVE ON TO OTHER PARTS OF THE NOTEBOOK.
+# 7. More complex  - emotions (optional)
+loughran: a more complex lexicon that gives a wider range of dimentions 
+NRC: 5 emotional dimensions (similart ot what IBM Watson does) - code same as for bing, just replace
+Afinn: assigns a sentiment score from -5 (very negative) to +5 (very positive)
 
-# Relationships between words: n-grams
+NOTE: LEXICONS OTHER THAN BING ARE VERY FINNICKY! THEY MAY OR MAY NOT WORK ON DIFFERENT MACHINES. ADVICE WOULD BE TO JUST USE BING, MENTION THE OTHERS, AND MOVE ON TO OTHER PARTS OF THE NOTEBOOK.
+
+
+
+# 8. Other types of analyses and visualisations
+## 8a. Relationships between words: n-grams
 Are there two words that come next to each other often? can we grasp some meaning from that?
-
 ```{r}
-# to create bigrams we go back to our text_df and create bigrams from tweets rather than single words
-text_bigrams <- text_df %>%
-  unnest_tokens(bigram, text, token = "ngrams", n = 2) %>% 
-  drop_na()
+# ngrams would be sets of any number (n) words that appear in sequential order
+    # n can be any number, so e.g., n=3 would make tri-grams, etc.
+# here, we will create bi-grams (n=2), but need to use the original tweet data
+  # we will go back to our text_df and create bi-grams from tweets rather than single words
 
+text_bigrams <- text_df %>%
+  unnest_tokens(bigram, text, token = "ngrams", n = 2) %>%   
+  drop_na()
+           
 text_bigrams
 ```
 
 ```{r}
 # most common bigrams
 text_bigrams %>%
- count(bigram, sort = TRUE)
+ count(bigram, sort = TRUE)  
+      # this is giving counts (from highest to lowest) of common word pairs
 ```
 
-# Analysing bigrams
 
+## 8b. Analysing and visualising bigrams
 ```{r}
 # sometimes we may want to separate the bigrams to analyse them
 bigrams_separated <- text_bigrams %>%
-  separate(bigram, c("word1", "word2"), sep = " ")
+  separate(bigram, c("word1", "word2"), sep = " ") 
+      # separate the two words that appear next to each other into two separate columns 
 
 bigrams_separated
 ```
 
-
 ```{r}
 # what words appear next to a certain word - we can filter this information out 
 bigrams_separated %>%
-  filter(word1 == "bug") %>%  # or word1
-  count(word2, sort = TRUE)
+  filter(word1 == "bug") %>%   # can also use word2 
+  count(word2, sort = TRUE)  # can also use word1 (if used word2 for the filter above)
+
+
+# this code is to filter out words that appear before or after the word "bug" based on whether you filter by word1 (i.e., the first word in the pair), or word2 (i.e., the second word in the pair)
+
+
 ```
 
-# Creating the bigram graphs
 ```{r}
+# Creating the bigram graphs
 # let's put the bigram counts into an object
 bigram_counts <- bigrams_separated %>% 
-  count(word1, word2, sort = TRUE)
+  count(word1, word2, sort = TRUE)  
+     # want to get counts of the bigrams in order to visualise it, so similar to the count for        # the bigrams above, but this time, the "pair" of words with their count is separated into 2      # columns of words, witht the same count value for the "word pair/bigram" 
 
 bigram_counts
 ```
@@ -241,50 +293,56 @@ bigram_counts
 bigram_graph <- bigram_counts %>%
   filter(n > 20) %>%
   graph_from_data_frame()
+    # creating a "network graph" of the bigrams in order to visualise later      
 
 bigram_graph
 ```
 
-
 ```{r}
-# We can very quickly to visualise it!
+# We can very quickly to visualise the word pairings/bigrams: BASIC version
 set.seed(2017)
 
 ggraph(bigram_graph, layout = "fr") +
   geom_edge_link() +
   geom_node_point() +
-  geom_node_text(aes(label = name), vjust = 1, hjust = 1)
+  geom_node_text(aes(label = name), nudge_x = 1, nudge_y = 1, repel=TRUE, size=3) +
+  theme_void()
+
+# nudge_x, nudge_y: help to nudge text along x and y positions by a certain value 
+# repel=TRUE: keeps the words from overlapping (i.e., "repel" each other)
+# size: is the font size
 ```
 
-
 ```{r}
-# or making it even prettier
+# visualise the word pairings/bigram: somewhat NICER version (colors, arrows, etc.)
 set.seed(2016)
 
-a <- grid::arrow(type = "closed", length = unit(.15, "inches"))
+a <- grid::arrow(type = "closed", length = unit(.06, "inches"))
 
 ggraph(bigram_graph, layout = "fr") +
   geom_edge_link(aes(edge_alpha = n), show.legend = FALSE,
-                 arrow = a, end_cap = circle(.07, 'inches')) +
-  geom_node_point(color = "lightblue", size = 5) +
-  geom_node_text(aes(label = name), vjust = 1, hjust = 1) +
+                 arrow = a, end_cap = circle(.05, 'inches')) +  
+  geom_node_point(color = "steelblue", size = 3) +
+  geom_node_text(aes(label = name), nudge_x = 1, nudge_y = 1, repel=TRUE, size=3) +
   theme_void()
 ```
 
-# Word correlations
-One useful function from widyr is the pairwise_count() function. The prefix pairwise_ means it will result in one row for each pair of words in the word variable. This lets us count common pairs of words co-appearing within the same section:
+
+# 8b. Word correlations
+One useful function from "widyr" is the pairwise_count() function. The prefix pairwise_  means it will result in one row for each pair of words in the word variable. This lets us count common pairs of words co-appearing within the same section (similar to n-grams where n=2):
 ```{r}
 # count words co-occuring
 word_pairs <- text_tidy %>%
   pairwise_count(word, line, sort = TRUE)
+       # the pairwise is similar to using ngrams where n=2;
+       # as this is specific to pairs, it will automatically separate the pair of words into 2 columns, whereas in ngrams, you had to write this step manually 
 
 word_pairs
 ```
 
 The phi coefficient is equivalent to the Pearson correlation, which you may have heard of elsewhere, when it is applied to binary data
-
 ```{r}
-# Let's look at the word correlations
+# Let's look at the word correlations between the word-pairs
 word_cors <- text_tidy %>%
   group_by(word) %>%
   filter(n() >= 20) %>%
@@ -292,28 +350,30 @@ word_cors <- text_tidy %>%
 
 word_cors
 
-# if there's time  - i would remove the "jewishladyblog enter win gift card giveaway" - include it in stopwords and rerun - clearly spam although this account is verified and looks like a real person...
+# if there's time  - I would remove the "jewishladyblog enter win gift card giveaway" - include it in stopwords and rerun - clearly spam although this account is verified and looks like a real person...
 ```
 
 ```{r}
-# what words correlate with "bug"
+# what words correlate with "bug", and their phi coefficient 
 word_cors %>%
-  filter(item1 == "bug" | item2 == "bug")
+  filter(item1 == "bug" | item2 == "bug")  
+     # you have item 1 and item 2 being the same word, so that you find any pairs where the 1st word (item1) is bug, along with any pairs where the 2nd word (item2) is bug
 ```
 
 ```{r}
-# visualising correlations 
+# visualising phi correlations (similar to the word pairs networks above)
 word_cors %>%
   filter(correlation > .4) %>% # we can choose the correlation level
   graph_from_data_frame() %>%
   ggraph(layout = "fr") +
   geom_edge_link(aes(edge_alpha = correlation), show.legend = FALSE) +
-  geom_node_point(color = "lightblue", size = 5) +
-  geom_node_text(aes(label = name), repel = TRUE) +
+  geom_node_point(color = "purple", size = 3) +
+  geom_node_text(aes(label = name), repel=TRUE, size=3) +
   theme_void()
 ```
 
-# Topic modeling
+
+# 8c. Topic modeling
 Latent Dirichlet allocation (LDA) is a particularly popular method for fitting a topic model. It treats each document as a mixture of topics, and each topic as a mixture of words. This allows documents to “overlap” each other in terms of content, rather than being separated into discrete groups, in a way that mirrors typical use of natural language
 
 LDA function may be a bit annoying - if it gets stuck, restart R and run the notebook again, sometimes if youu save the notebook throughout it doesn't run... 
@@ -325,35 +385,46 @@ text_dtm <- text_tidy %>%
   cast_dtm(line, word, n)
 ```
 
-
 ```{r}
 # Let's create the topic model
-text_lda <- LDA(text_dtm, k = 3, control = list(seed = 1234))
+text_lda <- LDA(text_dtm, k = 3, control = list(seed = 1234))  #k = number of topics (here, 3)
 text_lda
 ```
 
 ```{r}
-# we can extract the relevvant information about the topics
+# we can extract the relevant information about the topics
 text_topics <- tidy(text_lda, matrix = "beta")
 text_topics
 
-# we still get a couple of rogue b-s even after data cleaning...
+# we still get a couple of rogue b's even after data cleaning...
 ```
-
 
 ```{r}
 #Let's have a look what these topics look like!
 
+# seeing how the words group together topically
 text_top_terms <- text_topics %>%
   group_by(topic) %>%
-  top_n(10, beta) %>%
+  top_n(15, beta) %>%
   ungroup() %>%
   arrange(topic, -beta)
 
+
+# plotting the different topic-based graphs together
 text_top_terms %>%
   mutate(term = reorder(term, beta)) %>%
   ggplot(aes(term, beta, fill = factor(topic))) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~ topic, scales = "free") +
-  coord_flip()
+  coord_flip() +
+  theme(axis.text.x = element_text(size=8, angle=45, hjust=1))
+        # adjusting the x-axis labels to make it more legible
+
+
+
+# what do the topics look like (each graph) - do they look distinct or overlap a bit?
 ```
+
+# 9. Other resources for different text visualisations
+Chatterplots: https://towardsdatascience.com/rip-wordclouds-long-live-chatterplots-e76a76896098
+Other text visualisation ideas: http://textvis.lnu.se/
