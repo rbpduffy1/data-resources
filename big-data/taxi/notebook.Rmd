@@ -1,0 +1,196 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Source
+```{r}
+library(_ _ _ )
+
+# Open a spark connection to our local computer
+sc <- spark_connect(master = "_ _ _")
+
+# Store the data inside of spark rather than in R
+taxis <- spark_read_csv(sc, name = "taxis", path = "C:/Users/Decoded/Desktop/data/Taxi.csv", memory = FALSE)
+```
+
+## Explore
+```{r}
+library(dplyr)
+library(dbplot)
+
+```
+
+### Challenge 1
+As always, let's get a feel for the data by looking at the `head` of taxis
+```{r}
+taxis %>% _ _ _()
+```
+You can learn more about each of the columns (e.g. what does RateCodeID mean?) on the NYC gov page https://www1.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
+
+### Challenge 2
+Again, as always, we next want to get a summary of the data.
+
+Normally we'd use summary(), but because we are now in the **dplyr** world we need to do things a little differently (more info at https://www.rdocumentation.org/packages/dplyr ).
+
+We need to use the `summarise_all` function and tell it what kind of summary we want. Let's start with  `max`. What do you notice? (this might take some time - you can track the progress of the job in the SparkUI)
+```{r}
+#Let's use summarise_all function to calculate the maximum value of all column
+taxis %>% _ _ _(list(max))
+```
+
+Now try with `min` What do you notice?
+```{r}
+#Let's use summarise_all function to calculate the min value of all column
+taxis %>% _ _ _ (_ _ _)
+```
+You try lots more, e.g. mean, median, sd, n, n_distict.
+
+### Challenge 3
+There are clearly some outliers in our data. Let's try and get a visual sense of how many outliers there are.
+
+We are using the **dbplot** library to do all the heavy visualisation calculations inside of spark rather than in R.
+
+Create a `raster` plot using `trip_distance` and `total_amount` as the x and y axes (this will take some time - you can track the progress of the job in the SparkUI)
+```{r}
+# Use dbplot_raster  to visualise the data
+taxis %>% _ _ _(x=trip_distance, y=total_amount)
+```
+Raster plots are like scatter plots for big data -  each pixel contains many data points (like a 2D histogram - more info at https://db.rstudio.com/dbplot/#raster ).
+
+
+## Transform
+
+### Challenge 4
+Create a new variable `clean_taxis` by piping the taxi data through the `filter` function.
+
+You'll need to decide what range of data points to use.
+```{r}
+# Let's fileter the data with the function filter
+clean_taxis <- taxis %>% _ _ _(trip_distance < 100, passenger_count > 0, passenger_count < 10, total_amount > 0, total_amount < 1000, RateCodeID ==1)
+```
+
+Re-make the raster plot and see if it looks more reasonable.
+```{r}
+clean_taxis %>% _ _ _
+```
+
+### Challenge 5
+To answer our brief we need to look at the locations where most pickups and dropoff are happening.
+
+Ultimately we want to end up with a table of data that looks something like this:
+
+| LocationID | pickups | dropoffs | total |
+| ---------- | ------- | -------- | ----- |
+|     1      |  1234   |   5678   |  6912 |
+
+Let's start with pickups.
+
+We need to
+- select only the pickups column (PULocationID) and give it a new name `LocationID`
+- group_by the newly named column to collect all the same locations together
+- sum up the taxi rides in each group using `summarise` and the count function `n()`
+- sort the final result by `LocationID` using `arrange()`
+
+```{r}
+pickups <-  clean_taxis %>% select(LocationID = PULocationID) %>% group_by(LocationID) %>% summarise(pickups = n()) %>% arrange(LocationID)
+
+pickups
+```
+
+
+Now do the same for drop-offs
+```{r}
+dropoffs <-  _ _ _ 
+
+dropoffs
+```
+
+### Challenge 6
+Join the pickups and dropoffs tables together `by` their shared `LocationID` column and sort the result.
+```{r}
+#Let's use the function left_join to join pickups and dropoffs
+pickdrops_spark <- left_join(_ _ _ , _ _ _ , by="LocationID") %>%  arrange(LocationID)
+```
+
+```{r}
+pickdrops_spark
+```
+
+### Challenge 7
+Since the the number of locations is not that big, we can now bring the data back into R using `collect()`
+```{r}
+#Now time to collect into the R using the fucntion collect()
+pickdrops <- pickdrops_spark %>% collect()
+```
+
+### Challenge 8
+To complete the final bit of data transformation, add a total column using `mutate`
+```{r}
+#Let's calculate the total using the fucntion mutate
+pickdrops<- pickdrops %>% _ _ _ (total = _ _ _ + _ _ _)
+```
+
+Let's have a look
+```{r}
+pickdrops
+```
+
+## Visualise
+
+```{r}
+library(tmaptools)
+library(sf)
+library(maptools)
+library(ggplot2)
+library(raster)
+```
+
+### Challenge 9
+Read in the map shape file from https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+```{r}
+map <-st_read("C:/Users/Decoded/Desktop/data/taxi_zones/taxi_zones.shp")
+```
+
+What does the map look like?
+```{r}
+plot(map)
+```
+
+### Challenge 10
+We need to append the map with our pickup and dropoff data
+```{r}
+map <- merge(map, pickdrops)
+```
+
+Plot the map again and you'll see our new data appears, but it's not very nice to look at.
+```{r}
+plot(map)
+```
+
+### Challenge 11
+To make our maps nicer to look at we'll use ggplot. Plot 3 maps, one for pickups, dropoffs and total.
+```{r}
+#this is how you map the pickups
+# map drop offs and total
+ggplot(map)+geom_sf(aes(fill=pickups))+ scale_fill_gradient(low= "dark grey", high="yellow")
+
+
+```
+
+
+### Challenge 11
+To make our recommendations to the taxi company, let's do a simple plot of the top 10 pickup locations
+```{r}
+#use arrange and head to produce a top ten Boroughs with the highest demand
+top_pickups<- map %>%  arrange(desc(pickups)) %>%  head(10)
+```
+
+```{r}
+ggplot(top_pickups, aes(x= pickups, y = reorder(zone, pickups)))+ geom_point(size=3)
+```
+
+**IMPORTANT** Disconnect spark when finished to avoid running out of processing memory (RAM)
+```{r}
+spark_disconnect(sc)
+```
