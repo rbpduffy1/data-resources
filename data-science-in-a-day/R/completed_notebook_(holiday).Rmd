@@ -1,0 +1,181 @@
+---
+title: "Data Science in a Day - Holiday prediction"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+# Importing libraries 
+```{r}
+library(ggplot2)
+library(caTools)
+library(rpart) #This one is for building decision trees
+library(rpart.plot)
+library(ROCR)
+library(caret)
+```
+
+#  Binary Classification Problem: 
+Will our customers, who signed up, book a holiday?
+
+
+# Data Reading and Preparation
+```{r}
+# Let's start by loading our .csv file into R
+binary <- read.csv('book_binary - book_binary.csv')
+
+```
+
+Let's explore the dimensions of the data a little bit more
+```{r}
+# Print the first 6 rows of the dataframe
+head(binary)
+```
+
+
+```{r}
+# Get dimensions of the dataframe
+dim(binary)
+```
+
+```{r}
+# Get high-level information on the columns
+str(binary)
+```
+
+```{r}
+# Maybe we want to get some descriptive statistics of the numerical features? 
+summary(binary)
+```
+
+# Data Exploration
+
+```{r}
+plot(binary$book., col=c("dark red", "dark green"))
+```
+
+```{r}
+# Add axis lables and title
+hist(x = binary$age)
+```
+
+```{r}
+qplot(x = binary$Month_name)
+```
+
+
+
+# Building our model
+We don't want to include the thing we want to predict as the input data, so lets drop it. Also let's put the classes into their own variable for convenience
+
+We need to split by rows into one dataset that we will train our model on -- the training set -- and one which our model will not see and on which we test performance -- the testing set.
+
+```{r}
+# Split into training and testing 
+set.seed(123)
+sample <- sample.int(n = nrow(binary), size = floor(.75*nrow(binary)), replace = F)
+train <- binary[sample, ] 
+test  <- binary[-sample, ]
+```
+
+
+#  Modeling
+```{r}
+# Use the rpart function to train our decision tree 
+tree <-  rpart(train$book. ~ .,
+              method = "class",
+              data = train,control =rpart.control(minbucket = 20, cp = 0.002, maxsurrogate = 0, usesurrogate = 0, xval = 10))
+```
+
+The output of this model is very difficult to read, and in the package rpart there is not way to visualise the tree that you just made. For that reason we are going to use rpart.plot function from the rpart.plot library.
+```{r}
+# Use the rpart.plot() function
+rpart.plot(tree, type=5)
+``` 
+
+
+
+
+#  Multi Class Classification Problem: 
+To further personalise our services for those customers whom we predict will book a holiday, can we predict where they'll go?
+
+# Data Reading and Preparation
+```{r}
+# Let's start by loading our .csv file into R
+multiple <- read.csv('multiple - multiple.csv')
+
+```
+
+Let's explore the dimensions of the data a little bit more
+```{r}
+# Print the first 6 rows of the dataframe
+head(multiple)
+```
+
+
+```{r}
+# Get dimensions of the dataframe
+dim(multiple)
+```
+
+```{r}
+# Get high-level information on the columns
+str(binary)
+```
+
+```{r}
+# Maybe we want to get some descriptive statistics of the numerical features? 
+summary(multiple)
+```
+
+# Data Exploration
+
+```{r}
+plot(multiple$Continent)
+```
+
+```{r}
+# Add axis lables and title
+hist(x = multiple$age)
+```
+
+```{r}
+qplot(x = multiple$Month_name)
+```
+
+
+
+# Building our model
+We don't want to include the thing we want to predict as the input data, so lets drop it. Also let's put the classes into their own variable for convenience
+
+We need to split by rows into one dataset that we will train our model on -- the training set -- and one which our model will not see and on which we test performance -- the testing set.
+
+```{r}
+# Split into training and testing 
+set.seed(123)
+sample2 <- sample.int(n = nrow(multiple), size = floor(.75*nrow(multiple)), replace = F)
+train2 <- multiple[sample2, ] 
+test2  <- multiple[-sample2, ]
+```
+
+
+#  Modeling
+```{r}
+# Use the rpart function to train our decision tree 
+tree2 <-  rpart(train2$Continent ~ .,
+              method = "class",
+              data = train2,control =rpart.control(minbucket = 20, cp = 0.0002, maxsurrogate = 0, usesurrogate = 0, xval = 10))
+```
+
+```{r}
+tree2$variable.importance
+```
+
+
+```{r}
+# Use the rpart.plot() function
+rpart.plot(tree2)
+``` 
+
+
+

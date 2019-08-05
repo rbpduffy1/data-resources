@@ -1,0 +1,23 @@
+# 1. Training a decision tree model using Rpart
+```
+tree <-  rpart(Loan_Status ~ .,
+              method = "class",
+              data = train)
+```
+
+# 2. Plotting your model using rpart.plot
+```
+rpart.plot(tree, type=5, extra=2)
+```
+
+# 3. Making predictions on test dataset
+```
+Predict_tree <-  predict(object=tree,
+                        newdata= test,
+                        type="class")
+```
+
+# 4. Output confusion matrix to assess how well our model has done
+```
+confusionMatrix(data=Predict_tree, reference= test$Loan_Status)
+```

@@ -1,0 +1,264 @@
+---
+title: "Data Science in a Day"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+# Importing libraries 
+```{r}
+library(ggplot2)
+library(caTools)
+library(rpart) #This one is for building decision trees
+library(rpart.plot)
+library(ROCR)
+library(caret)
+```
+# Data Reading and Preparation
+```{r}
+# Let's start by loading our .csv file into R
+loan <- read.csv("loan_data.csv")
+```
+Let's explore the dimensions of the data a little bit more
+```{r}
+# Print the first 6 rows of the dataframe
+head(loan)
+# Anyone guess what the command for getting the last 6 rows is?
+# tail(loan)
+```
+```{r}
+# Get dimensions of the dataframe
+dim(loan)
+```
+```{r}
+# Get high-level information on the columns
+str(loan)
+# Explain all this
+```
+```{r}
+# Maybe we want to get some descriptive statistics of the numerical features? Try doing this on your own (Google)
+summary(loan)
+```
+#Data Cleaning
+1) Are there any missing/NA values?
+--> if so, how do we deal with them?
+```{r}
+# Replace all NULL values with NA (this is to be able to us is.na() in the next chunk)
+loan[loan == ""] = NA
+```
+```{r}
+# Use the is.na() function to return values in the dataframe which are Null/NA. Get first 6 rows of dataframe 
+# only
+head(is.na(loan))
+```
+```{r}
+# Let's get the the sum of NA values in each of the columns/features
+colSums(is.na(loan))
+```
+Now that we have an idea of where our NA values our located, how do we deal with them?
+Note We engage the learners before each of the following blocks to get them thinking of best approaches
+Note2 These are our assumptions. In data cleaning you make assumptions based on common sense, and domain knowledge. The following is just how I did it - learners can choose to clean their data differently, e.g. some may choose to delete all rows with ANY NAs, and that's fine! It's their model in the end, they're the data scientists responsible for it.
+One way that worked was to ask before dealing with each variable: who thinks we should delete the rows? (hands up) Who thinks we should replace them with someything? Ask why in each case to get them thinking.
+```{r}
+head(loan)
+```
+Deal with one variable at a time..
+Deal with Gender -- options:
+Delete rows with NAs
+Replace them with Males because they're the majority
+Maybe it's people who don't want to declare their gender - should we create an 'Unspecified' value? Not Recommended
+```{r}
+# Let's say we drop rows with NAs
+loan <- loan[which(!is.na(loan$Gender)), ]
+# Check 
+colSums(is.na(loan))
+```
+Deal with Married -- options:
+Delete rows with NAs -- NAs make no sense, i.e. it's either Yes or No (1 or 0)
+Replace with 0
+```{r}
+# Let's find out what unique values are there:
+summary(loan$Married)
+```
+```{r}
+# Let's say we drop rows with NAs
+loan <- loan[which(!is.na(loan$Married)), ]
+# Check 
+colSums(is.na(loan))
+```
+Deal with Dependents -- options:
+Delete rows with NAs
+Replace NAs with 0s -- i.e. NA dependents = 0 dependents
+Possibly assume people don't want to declare and create new attribute value?
+```{r}
+# Check unique values of Dependents
+summary(loan$Dependents)
+```
+```{r}
+# Let's say we assume that NA = 0, and replace appropriately. Note, we're replacing with '0' as a character, not 0 
+# as a number. 0 would create a new attribute. 
+loan$Dependents[is.na(loan$Dependents)] <- "0"
+# Check 
+colSums(is.na(loan))
+```
+Deal with Self-employed -- options:
+Delete rows with NAs -- not safe to assume anything. Also as a bank, this maybe essential info to make a judgement on loan issuing
+Assume NA = people are not self-employed
+Assume NA = people are self-employed? Maybe some interesting justification for this for financial services clients
+```{r}
+# Check unique values of Self_employed
+summary(loan$Self_Employed)
+```
+```{r}
+# Let's say we assume that NA = 'No' 
+loan$Self_Employed[is.na(loan$Self_Employed)] <- "No"
+# Check 
+colSums(is.na(loan))
+```
+Deal with Loan Amount -- options:
+Delete rows with NAs -- after all we need a loan amount in order to issue a loan!
+Replace with 0
+```{r}
+# Check number of NA of Loan Amount variable 
+summary(loan$LoanAmount)
+```
+```{r}
+# Let's say we assume that NA = 0.0, or float(0) 
+loan$LoanAmount[is.na(loan$LoanAmount)] <- 0.0
+# Check 
+colSums(is.na(loan))
+```
+Deal with Loan Amount Term -- options:
+Delete rows with NAs -- after all don't we need a term amount in order to issue the loan? (common sense)
+Replace with 0?
+```{r}
+# Check Loan Amount term unique values 
+summary(loan$Loan_Amount_Term)
+```
+```{r}
+# Let's say we drop rows with NAs
+loan <- loan[which(!is.na(loan$Loan_Amount_Term)), ]
+# Check 
+colSums(is.na(loan))
+```
+Deal with Credit History -- options:
+Delete rows with NAs
+Replace with 0 -- NA credit history is the same as no credit history?
+```{r}
+# Check Credit History unique values
+summary(loan$Credit_History)
+```
+```{r}
+# Let's say we assume that NA = 0.0, or float(0) 
+loan$Credit_History[is.na(loan$Credit_History)] <- 0.0
+# Check 
+colSums(is.na(loan))
+```
+```{r}
+# Transformations can cause empty/unused factor levels to appear, let's get rid of them before moving on
+loan <- droplevels(loan)
+# Let's check the dimensions now that we've done a bit of cleaning
+dim(loan)
+```
+# Data Exploration
+Note 
+No need to go through each of the following visualisation examples, just two is enough. Purpose is to show what we can do. If you can spare 5 mins, it may be worth asking them to -- in pairs -- build any of the following visualisations on their own (basically, let them google it and see for themselves, and then type it out at the end of the 5 mins).
+```{r}
+plot(loan$Loan_Status, col=c("dark red", "dark green"))
+```
+```{r}
+# Add axis lables and title
+plot(loan$Loan_Status, col=c("dark red", "dark green"))
+title(main = list('Distribution of Loan status in our data', cex = 1.5),
+      ylab = list('Frequency', cex = 1.2),
+      xlab = list('Loan Status', cex = 1.2))
+```
+```{r}
+# Example 2: Countplot of Loan status while accounting for Gender
+# Grouped Bar Plot
+counts <- table(loan$Loan_Status, loan$Gender)
+barplot(counts, main="Loan status by gender",
+ xlab ="Loan status", 
+ ylab = "Frequency",
+ col=c("dark red","dark green"),
+ legend=rownames(counts),
+ beside =TRUE)
+```
+```{r}
+# Example 2.2 - maybe we want to graph horizontally instead?
+ 
+counts <- table(loan$Loan_Status, loan$Gender)
+barplot(counts, main="Loan status by gender",
+ xlab ="Loan status", 
+ ylab = "Frequency",
+ col=c("dark red","dark green"),
+ legend=rownames(counts),
+ beside =TRUE,
+ horiz = TRUE)
+```
+Explore other relationships using same syntax.
+With every graph, try adding a title, and changing the X and Y labels appropriately. Feel free to play around with seaborn palettes and styles!
+Note You can skip to this instead of going through the above if you are short on time.
+REMEMBER: The point of all this isn't Data Exploration (we could spend a whole day on it!). The point is to get through all the data pipeline
+```{r}
+# Comment 
+# Let them tell you what to type.
+```
+# Building our model
+We don't want to include the thing we want to predict as the input data, so lets drop it. Also let's put the classes into their own variable for convenience
+```{r}
+# R has many data types. Let's explore the distribution of different data types across our features
+str(loan)
+```
+```{r}
+# Let's drop the ID column as it adds no useful information 
+loan$Loan_ID <- NULL
+str(loan)
+```
+We need to split by rows into one dataset that we will train our model on -- the training set -- and one which our model will not see and on which we test performance -- the testing set.
+```{r}
+set.seed(123)
+sample <- sample.int(n = nrow(loan), size = floor(.75*nrow(loan)), replace = F)
+train <- loan[sample, ] 
+test  <- loan[-sample, ]
+```
+#  Modeling
+```{r}
+tree <-  rpart(Loan_Status ~ .,
+              method = "class",
+              data = train)
+#Once the tree is ready we could see the results using the function summary.
+summary(tree)
+```
+The output of this model is very difficult to read, and in the package rpart there is not way to visualise the tree that you just made. For that reason we are going to use rpart.plot function from the rpart.plot library.
+```{r}
+rpart.plot(tree, type=5, extra=2)
+```
+```{r}
+tree2 <-  rpart(Loan_Status ~ .,
+              method = "class",
+              data = train,
+              control =rpart.control(minsplit = 1, maxdepth = 15 ),
+              parms= list(split ="gini"))
+#Once the tree is ready we could see the results using the function summary.
+summary(tree2)
+```
+```{r}
+rpart.plot(tree2, type=5, extra=2)
+```
+# Making Predictions
+Now that we've trained our models, it's time to put them to the test. We'll do this by predicting test set values and comparing those predictions to the values we already know are the ground truth.
+```{r}
+# Predictions made using model 1 (simple one)
+Predict_tree <-  predict(object=tree,
+                        newdata= test,
+                        type="class")
+confusionMatrix(data=Predict_tree, reference= test$Loan_Status)
+```
+```{r}
+# Predictions made using model 1 (complex one)
+Predict_tree2 <-  predict(object=tree2,
+                        newdata= test,
+                        type="class")
+confusionMatrix(data=Predict_tree2, reference= test$Loan_Status)
+```

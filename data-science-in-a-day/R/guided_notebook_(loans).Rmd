@@ -1,0 +1,266 @@
+---
+title: "Data Science in a Day"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+# Importing libraries 
+```{r}
+library(ggplot2)
+library(caTools)
+library(rpart) #This one is for building decision trees
+library(rpart.plot)
+library(ROCR)
+library(caret)
+```
+
+
+# Data Reading and Preparation
+```{r}
+# Let's start by loading our .csv file into R
+
+```
+Let's explore the dimensions of the data a little bit more
+```{r}
+# Print the first 6 rows of the dataframe
+
+
+```
+
+
+```{r}
+# Get dimensions of the dataframe
+
+```
+
+```{r}
+# Get high-level information on the columns
+
+```
+
+```{r}
+# Maybe we want to get some descriptive statistics of the numerical features? 
+
+```
+
+#Data Cleaning
+1) Are there any missing/NA values?
+--> if so, how do we deal with them?
+```{r}
+# Replace all NULL values with NA (this is to be able to us is.na() in the next chunk)
+
+```
+
+```{r}
+# Use the is.na() function to return values in the dataframe which are Null/NA. Get first 6 rows of dataframe 
+# only
+
+```
+
+```{r}
+# Let's get the the sum of NA values in each of the columns/features
+```
+
+Now that we have an idea of where our NA values our located, how do we deal with them?
+
+Deal with one variable at a time..
+
+Deal with Gender -- options:
+1) Delete rows with NAs
+2) Replace them with Males because they're the majority
+3) Maybe it's people who don't want to declare their gender - should we create an 'Unspecified' value? 
+
+```{r}
+# Let's say we drop rows with NAs
+
+# Check 
+#colSums(is.na(loan))
+```
+
+Deal with Married -- options:
+1) Delete rows with NAs -- NAs make no sense, i.e. it's either Yes or No (1 or 0)
+2) Replace with 0
+```{r}
+# Let's find out what unique values are there:
+
+```
+
+
+```{r}
+# Let's say we drop rows with NAs
+
+# Check 
+#colSums(is.na(loan))
+```
+
+Deal with Dependents -- options:
+1) Delete rows with NAs
+2) Replace NAs with 0s -- i.e. NA dependents = 0 dependents
+3) Possibly assume people don't want to declare and create new attribute value?
+```{r}
+# Check unique values of Dependents
+
+```
+
+```{r}
+# Let's say we assume that NA = 0, and replace appropriately. Note, we're replacing with '0' as a character, not 0 as the number, 0, would create a new attribute. 
+
+# Check 
+#colSums(is.na(loan))
+```
+
+Deal with Self-employed -- options:
+1) Delete rows with NAs -- not safe to assume anything. Also as a bank, this maybe essential info to make a judgement on loan issuing
+2) Assume NA = people are not self-employed
+3) Assume NA = people are self-employed? 
+
+```{r}
+# Check unique values of Self_employed
+
+```
+
+```{r}
+# Let's say we assume that NA = 'No' 
+
+# Check 
+#colSums(is.na(loan))
+```
+
+Deal with Loan Amount -- options:
+1) Delete rows with NAs -- after all we need a loan amount in order to issue a loan!
+2) Replace with 0
+```{r}
+# Check number of NA of Loan Amount variable 
+
+```
+
+```{r}
+# Let's say we assume that NA = 0.0, or float(0) 
+
+# Check 
+#colSums(is.na(loan))
+```
+
+Deal with Loan Amount Term -- options:
+1) Delete rows with NAs -- after all don't we need a term amount in order to issue the loan? (common sense)
+2) Replace with 0?
+```{r}
+# Check Loan Amount term unique values 
+
+```
+
+```{r}
+# Let's say we drop rows with NAs
+
+# Check 
+#colSums(is.na(loan))
+```
+
+Deal with Credit History -- options:
+Delete rows with NAs
+Replace with 0 -- NA credit history is the same as no credit history?
+```{r}
+# Check Credit History unique values
+
+```
+
+```{r}
+# Let's say we assume that NA = 0.0, or float(0) 
+
+# Check 
+#colSums(is.na(loan))
+```
+
+```{r}
+# Transformations can cause empty/unused factor levels to appear, let's get rid of them before moving on
+#loan <- droplevels(loan)
+
+# Let's check the dimensions now that we've done a bit of cleaning
+
+```
+
+# Data Exploration
+
+```{r}
+#plot(loan$Loan_Status, col=c("dark red", "dark green"))
+```
+
+```{r}
+# Add axis lables and title
+
+```
+
+```{r}
+# Example 2: Countplot of Loan status while accounting for Gender
+# Grouped Bar Plot
+
+```
+
+```{r}
+# Example 2.2 - maybe we want to graph horizontally instead?
+ 
+```
+
+Explore other relationships using same syntax.
+With every graph, try adding a title, and changing the X and Y labels appropriately. Feel free to play around with seaborn palettes and styles!
+
+REMEMBER: The point of all this isn't Data Exploration (we could spend a whole day on it!). The point is to get through all the data pipeline.
+
+
+# Building our model
+We don't want to include the thing we want to predict as the input data, so lets drop it. Also let's put the classes into their own variable for convenience
+```{r}
+# R has many data types. Let's explore the distribution of different data types across our features
+#str(loan)
+```
+
+```{r}
+# Let's drop the ID column as it adds no useful information 
+
+```
+
+We need to split by rows into one dataset that we will train our model on -- the training set -- and one which our model will not see and on which we test performance -- the testing set.
+```{r}
+# Split into training and testing 
+```
+
+```{r}
+
+```
+
+
+#  Modeling
+```{r}
+# Use the rpart function to train our decision tree 
+
+#Once the tree is ready we could see the results using the function summary.
+
+```
+
+The output of this model is very difficult to read, and in the package rpart there is not way to visualise the tree that you just made. For that reason we are going to use rpart.plot function from the rpart.plot library.
+```{r}
+# Use the rpart.plot() function
+```
+
+```{r}
+# Train a second decision tree!
+
+#Once the tree is ready we could see the results using the function summary.
+```
+
+```{r}
+# Use the rpart.plot() function to plot your decision tree
+```
+
+# Making Predictions
+Now that we've trained our models, it's time to put them to the test. We'll do this by predicting test set values and comparing those predictions to the values we already know are the ground truth.
+```{r}
+# Predictions made using model 1 (simple one)
+
+```
+
+```{r}
+# Predictions made using model 1 (complex one)
+
+```

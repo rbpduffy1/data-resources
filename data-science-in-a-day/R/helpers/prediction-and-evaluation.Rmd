@@ -1,0 +1,11 @@
+# 3. Making predictions on test dataset
+```
+Predict_tree <-  predict(object=tree,
+                        newdata= test,
+                        type="class")
+```
+
+# 4. Output confusion matrix to assess how well our model has done
+```
+confusionMatrix(data=Predict_tree, reference= test$Loan_Status)
+```
