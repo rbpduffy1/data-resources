@@ -1,7 +1,5 @@
-# Programming resources
+# Programming
 
-This document contains link to workshop notebooks for programming.
+[Python workshop](./Python/README.md)
 
-[Python notebook](./python-programming-learner-notebook.ipynb)
-
-[Python catch-up notebook](./python-programming-catch-up-learner-notebook.ipynb)
+[R workshop](./R/README.md)
