@@ -1,3 +1,84 @@
+# Data Academy Hackathons Overview
+
+### Briefing
+
+A hackathon is an exciting opportunity to hone the skills of your sprint, pursue your interests, collaborate and experiment. In this immersive, one-day experience in which you're free to fail and test things out, you'll aim to make use of company data to build something of real impact for your organisation. The day will conclude with you presenting your creations to company leaders.
+
+There are four hackathons on the Data Academy, one at the end of each Sprint. The creations of hackathons may well take a multiplicity of forms ranging from web-based applications to data-driven articles. The best projects - whatever form they take - will be showcased and published both within your company and outside it!
+
+### Data
+We strongly encourage, if possible, that you bring your own data to the hackathons. Bringing real-world data that you currently work with has several benefits - you'll be able to analyse it faster, because of existing familiarity, but most importantly, applying your new skills to data you actually make use of could allow you to see immediate benefits in your day-to-day work.
+
+We're also working with your IT and Data departments to source good quality data for you to analyse and work on. If for any reason this isn't retrievable for a particular hackathon, we'll have a plethora of backup datasets for you to explore.
+
+### Rough agenda
+
+Each hackathon - and each project within it - is unique, so a detailed plan in advance is neither possible nor desirable. But the structure of each hackathon will be roughly similar, and look something like this:
+
+1. Problem definition:
+	- Determine problem space
+	- Decide objective and success metrics
+2. Preparation
+	- Select and source data
+	- Explore your data
+	- Visualise your data
+3. Solution development
+	- Hack!
+4. Deployment (Share)
+	- Polish your creation
+	- Present to judges
+		- What were your success metrics?
+		- What was your solution?
+		- What went well?
+		- What could be improved?
+
+
+Breaks will be taken regularly, at natural stopping points.
+
+Throughout the day we'll run short breakout sessions on key parts of your work. These will be either opportunities to share an aspect of your project, or a review of important principles/techniques for a section of the data science pipeline.
+
+### Aims
+- Explore: make headway on interesting problems.
+- Create: use this as an opportunity to make an impact.
+- Consolidate: hone your skills from the previous sprint.
+- Compete: produce the best product.
+- Experiment: try out new tools and techniques.
+- Collaborate: share ideas and work together.
+
+
+You can find more specific information and relevant datasets for specific hackathons below:
+
+* [Hackathon 1](./hackathon-1.md)
+* [Hackathon 2](./hackathon-2.md)
+* [Hackathon 3](./hackathon-3.md)
+* Hackathon 4 (coming **soon**)
+
+### Hackathon Checklist
+
+To prepare for the hackathon, make sure you've:
+- Worked through some of the online modules for your current sprint
+- Looked at the review materials provided in each module
+- Completed the registration form for the event
+- Have the software you'll need to complete some analysis (RStudio, Jupyter, etc.)
+- Have an idea of some projects you'd like to work through
+- Have some datasets you could use for analysis
+- Think about data questions you could ask and what you hope to achieve
+
+### FAQs
+
+- Which group will I work with?
+  It's up to you - you can stick with the group you've been working with over the sprint, or you can form a new group, just for the day.
+
+- What will our outputs be?
+  Just like your monthly projects, you should feel free to be creative with your outputs. Often groups will do analysis in an R or Python notebook, but you can also try to produce a [web app](https://shiny.rstudio.com/), Excel dashboard, or [data journalism piece](https://pudding.cool/).
+
+- What support will I receive?
+  During the hackathon, the Decoded team will try and support your progress as much as possible (but we won't do the work for you!)
+
+- What is the purpose of the hackathon?
+  Hackathons are great opportunities to work collaboratively and take the time and space to think about a specific problem in a time-constrained environment. Hackathons are also opportunities to consolidate the learning that has taken place over the past sprint.
+
+
 # Sprint 1 Hackathon
 
 It's time for the first Hackathon - 8 hours of independent data crunching and analysis! It's a chance to put everything you've learnt over the past sprint into practice, experience the realities of data science, and test out new ideas in a experimental environment.  
