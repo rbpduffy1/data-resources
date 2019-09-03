@@ -1,13 +1,52 @@
+## Degree centrality
+
 ```{r}
-g <- set_vertex_attr(g, "color", value = 'cornflowerblue')
+
+data <- toVisNetworkData(g)
+
 # Create numerical vector of various centrality measures --  betweenness, eignecentrality, and pagerank.
-centrality1 <- as.numeric(betweenness(g))
-centrality2 <- as.numeric(eigen_centrality(g)$vector)
-centrality3 <- as.numeric(page_rank(g)$vector)
-# Create the respective vectors
-vector1 <- 0.022*sqrt(centrality1)
-vector2 <- 2*sqrt(centrality2)
-vector3 <- 2*sqrt(centrality3)
-# Plot threejs plot of graph setting vertex size to the vector specified above
-(graphjs(g, vertex.size = vector2, vertex.label = V(g)$name, brush = TRUE))
+
+data$nodes$value <- as.numeric(centralization.degree(g)$res/length(E(g)))
+data$nodes$title <- data$nodes$label
+data$nodes$label <- NULL
+
+visNetwork(nodes = data$nodes, edges = data$edges) %>% 
+  visIgraphLayout(randomSeed = 123) %>%
+  visNodes(scaling = list(min = 30, max = 100), color = list(background = "lightblue", highlight = "yellow")) %>%
+  visEdges(color = list(color = "cornflowerblue", highlight = "red"))
+
+```
+
+
+## Betweenness centrality
+```{r}
+data <- toVisNetworkData(g)
+
+# Create numerical vector of various centrality measures --  betweenness, eignecentrality, and pagerank.
+
+data$nodes$value <- as.numeric(betweenness(g))
+data$nodes$title <- data$nodes$label
+#data$nodes$label <- NULL
+
+visNetwork(nodes = data$nodes, edges = data$edges) %>% 
+  visIgraphLayout(randomSeed = 123) %>%
+  visNodes(scaling = list(min = 30, max = 100), color = list(background = "lightblue", highlight = "yellow")) %>%
+  visEdges(color = list(color = "cornflowerblue", highlight = "red"))
+```
+
+
+## Eigenvector centrality
+```{r}
+data <- toVisNetworkData(g)
+
+# Create numerical vector of various centrality measures --  betweenness, eignecentrality, and pagerank.
+
+data$nodes$value <- as.numeric(eigen_centrality(g)$vector)
+data$nodes$title <- data$nodes$label
+data$nodes$label <- NULL
+
+visNetwork(nodes = data$nodes, edges = data$edges) %>% 
+  visIgraphLayout(randomSeed = 123) %>%
+  visNodes(scaling = list(min = 30, max = 100), color = list(background = "lightblue", highlight = "yellow")) %>%
+  visEdges(color = list(color = "cornflowerblue", highlight = "red"))
 ```
