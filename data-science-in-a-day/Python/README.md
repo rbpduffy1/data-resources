@@ -1,3 +1,7 @@
+# Download data link
+
+[Data](https://github.com/DecodedCo/data-resources/raw/master/data-science-in-a-day/Python/data.zip)
+
 # Graphviz Installation Guide
 
 Exercise building a decision tree in scikit learn for the "Predicting Loans" dataset.
