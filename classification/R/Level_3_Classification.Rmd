@@ -270,6 +270,8 @@ So they're doing pretty well!
 So we have a pretty great model working. Finally we can answer our question!
 
 ```{r}
+#Store the confusion matrix for our model in a variable
+
 # the first part is add our predictions to the unlabelled part of the data i.e. the "implement" subset
 
 
