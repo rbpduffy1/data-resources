@@ -1,0 +1,355 @@
+
+title: "Decision Trees and Random Forest!"
+output: html_notebook
+---
+
+# Level 1 - Please fill the  gaps ( - - - ) with the appropiate code
+
+# 0. Problem
+
+You have been hired by GAP as a data analyst! Your first task is to predict how many units of a limited edition jumper will be purchased by the most loyal customers. To do that you and your team have conducted a survey of 701 loyal customers. You and your team have collected some valuable data including age, gender, salary, how much money the customer spent that day at the store and the last month, whether the customer has used the online shop, and how many jumpers the customer bought the last year. Some of the customers reply to the last question of the survey to make it clear whether or not they will buy the limited-edition jumper, but unfortunately the last question was not recorded for all of the interviewed people. You want to know how many of the 701 interviewed customers will buy the jumper - if more than 70% of the interviewed customers are likely to buy the jumper, then the limited-edition jumper will be launched, but if the percentage is lower then the jumper will be axed. To answer this we will have to use a classification model to fill in the blanks!
+
+
+# 1. Overview
+
+This notebook uses decision trees to classify and predict whether the age, gender, salary, how much money the customer spent today and the last month in GAP, online habits, distance to nearest store, and how many jumpers the customer bought in the last year could predict whether they will buy the new jumper or not.
+
+# 2. Load libraries
+
+The rpart and rpart.plot libraries include all the functions needed to evaluate recursive partitioning for classification, regression and survival trees. In particular, rpart.plot will help you to evaluate graphically the decision trees!
+
+Additionally, we are going to explore the package randomForest, which is going to help us to run a random forest model.
+
+Finally, to test the different models that we are going to implement we are going to use the library caret to visualise and evaluate our classifiers.
+
+This is also a good point to set your working directory to the folder you'll use to save your data.
+
+You could annotate your code with "#" after calling the libraries with a brief description of each library.
+
+Do not forget to also call the library ggplot2 to visualise the data!
+
+```{r}
+#install.packages(c("rpart", "rpart.plot", "randomForest", "ggplot2", "AppliedPredictiveModeling", "caret", "ROCR","e1071"))
+
+library(rpart) # to build decision trees
+library(rpart.plot)  # to visualise decision trees
+library(ggplot2)  # for simple scatter plot visualisations
+library(AppliedPredictiveModeling)  # to test models and make predictions
+library(caret)   # evaluating classification performance using confusion matrix
+```
+
+
+# 3. Load data
+
+We will use the whole dataset of loyal GAP customers, though only a fraction of the loyal customers have expressed directly if they are willing to buy the limited edition jumper.  
+
+Download the zip files and extract to your working directory from  [here](https://github.com/DecodedCo/data-resources/blob/master/datasets/classification_workshop_data.zip) to your working directory
+
+```{r}
+data <- read.csv(- - -)
+
+head(- - -) #What do you think is happening with the column "Decision"?
+```
+
+Let's explore the bottom of the data too:
+
+```{r}
+tail(- - -)
+```
+
+
+
+# 4. Explore and transform your data
+
+Take a look at the data you've just imported to make sure everything loaded properly.
+
+```{r}
+str(- - -)
+```
+
+```{r}
+summary(- - -)
+```
+
+After a quick glance, I noticed there were a few changes I wanted to make - let's do some cleaning!
+
+```{r}
+# let's start with making all variable names lower case, so that the naming is uniform and we don't have to go back and forth looking up the variable names
+# added avantage - this also will fix the misspelling of "salaRy"!
+names(data) <- tolower(- - -(data))
+
+summary(- - -)
+```
+
+```{r}
+# "gender" variable has 6 levels in the data, but as we can see from the summary, they are same "male" and "female" with some coding/entry errors
+data$gender[- - - == "Female"] <- "female"
+data$gender[- - - == "m"] <- - - -
+data$gender[- - - == - - -] <- - - -
+- - -[- - - == - - -] <- - - -
+
+summary(data$gender)
+```
+
+```{r}
+# to remove unused factor levels of a factor variable we can use function droplevels()
+data$gender <- droplevels(- - -)
+
+summary(data$gender)
+```
+
+
+```{r}
+# The column name of last month spent is not clear, maybe we could change the name to spent_month
+colnames(data)[5] <- "spent_month"
+
+# Take a look at data and see how it has changed.
+head(- - -)
+```
+
+```{r}
+# The "online" variable should say yes or no rather than 1 or 0;
+data$online[- - - == 1] <- "yes"
+- - -[- - - == 0] <- "no"
+
+# now convert it to a factor
+data$online <- as.factor(- - -)
+
+# Now we can take a look at data and see how it has changed.
+head(data)
+```
+
+
+```{r}
+# The "decision" variable should say yes or no, rather than 1 or 0;
+data$decision[- - - == 1] <- "yes"
+data$decision[- - - == - - -] <- - - -
+
+# now convert it to a factor
+data$decision <- as.factor(- - -)
+
+# Now we can take a look at the decision data and see how it has changed.
+summary(- - -)
+```
+
+
+
+# 4.1 Training, testing and prediction datasets
+
+It is important also to define which subsets of our data are going to be used for training and for testing. Then, when we found the optimal model, we could predict the data that is not labeled, and finally we can calculate out of 701 how many customers are likely to buy the limited edition jumper in GAP. Let's make 3 datasets for that:
+
+1. train - to train our model on
+2. test - to test how well our model is performing
+3. implement - the unlabeled portion of our dataset for which we don't have values for "decision" (NA)
+
+Let's start with 1 & 2, which come from the labelled portion of the dataset i.e. those for which we have known "decision" values. Subset out the labelled part. To do that we need to subset our data without NA's:
+
+```{r}
+data_labeled <-  data[!is.na(- - -),]# This is the way we could have our dataset without NA's for the variable "decision"
+head(- - -) #Let's check out the data!
+```
+
+```{r}
+# Let's have a look a bit more at the class that we're interested in predicting - decision
+summary(- - -)
+```
+
+Now that we have our dataset without NA's is time to divide the dataset into train and test subset to evaluate the model.
+
+```{r}
+# set seed so that same sample can be reproduced in future; alternatively you could check how different will be your models if you change the set.seed number.
+set.seed(100)
+
+# now selecting 75% of the data as a sample from the total 'n' rows of the data  
+sample <- sample.int(n = nrow(- - -), size = floor(.75*nrow(data_labeled)), replace = F)
+# why do think we use 75%, why not 80% or even the whole dataset? Why you do not try to use 50%, 60%, 70%, 80%, and 90%?
+
+train <- data_labeled[- - -, ] #  subset using "sample" to create our train set
+test  <- - - -[- - -, ] # subset using everything BUT "sample" to create our test set
+```
+
+OPTIONAL - IF THERE'S TIME CAN GO BACK AND TRY DATA PARTITION INSTEAD
+
+We can see from the output that the two classes are not well balanced - there are around a third more "yes" than "no". If we use a random split of the dataset it is likely we'll end up with a different balance between these two classes wich may effect our modeling and predictability, so we'd like to keep the proportion of yes/no the same as in the full labeled dataset, but take a random subset of the data to train our model on. There is a way to do this using "caret" package function createDataPartition()
+
+```{r}
+# Let's split the data into train and test datasets
+dpart <- createDataPartition(data_labeled$decision, p = 0.75, list = FALSE)
+train <- data_labeled[dpart, ]
+test <- data_labeled[-dpart, ]
+```
+
+OPTIONAL - END
+
+
+```{r}
+# Let's create our third dataset "implement"" for predicting the values of unlabeled data
+implement <- data[is.na(- - -),]
+```
+
+
+# 5. Visualise your data
+
+Now that my data is in the format I want, I can take a quick look at it using the qplot function. Let's explore different variables such as the salary, age range, and number of jumpers.
+
+```{r}
+qplot(x = - - -, y = - - -, col = - - -)
+# What can you conclude from the plot?
+# Try different plots to see whether it is possible to see which variables could help in the classification analysis.
+```
+
+```{r}
+qplot(x = - - -, y = - - -, col = - - -)
+# What can you conclude from the plot?
+# Try different plots to see whether it is possible to see which variables could help in the classification analysis.
+```
+
+Not too much we can gain from this... let's do the classification systematically using decision trees!
+
+# 6. Classification model (Decision trees)
+
+Now it is time to use the packages rpart and rpart.plot to build our trees. The function rpart is an excellent tool to build decision trees optimising either information gain or gini impurity. It is important to change the parameters that are controlling the algorithm, check out the documentation of rpart in this [link](https://cran.r-project.org/web/packages/rpart/rpart.pdf).
+
+```{r}
+# Let's start with having a look at the simplest tree by using the function rpart with default arguments
+model_0 <- rpart(decision ~ ., data = train)
+
+#Once the tree is ready we can see the results using the function summary.
+summary(- - -)
+```
+
+The output of this model is very difficult to read, and in the rpart package there is no way to visualise the tree that you just made. For that reason we are going to use rpart.plot function from the rpart.plot library. You can read about the documentation using the following [link](https://cran.r-project.org/web/packages/rpart.plot/rpart.plot.pdf)
+
+```{r}
+rpart.plot(model_0, type = - - -, extra = - - -)
+```
+
+
+```{r}
+# Let's see if we can improve it!
+# Could you tell what the parameters (control and parms) are controlling?
+model_1 <-  rpart(decision ~ .,
+               method = - - -,
+               data = - - -,
+               control = rpart.control(minsplit = - - -, depth = - - -),
+               parms = list(split = - - -))
+
+rpart.plot(model_1, - - -, - - -)
+```
+
+The current model is a tree build optimising information gain - could you tell why?
+
+Now it is time to build a Gini impurity model. Which parameter shall we change?
+
+```{r}
+model_2 <-  rpart(decision ~ .,
+              - - -,
+              - - -,
+              - - -,
+              parms = list(split = - - -))
+summary(model_2)
+rpart.plot(model_2, - - -, - - -)
+```
+
+# 6.1. Build multiple classification models
+
+Now we are going to build different decision trees (optimising gini impurity and information gain). Experiment with changing the parameters as you build the models. This will build a variety of trees that you can compare to find the best and most reliable model.
+
+For the example: I am going to compare the trees with similar parameters except for split. Do you know which algorithm we are using if the parameter split is "information"?
+
+```{r}
+model_info <-  rpart(- - -,
+                    - - -,
+                    - - -,
+                    - - - = rpart.control(minsplit = 1, maxdepth = 3, cp = 0),
+                    - - - = list(split = - - -))
+
+# Now is your turn to change other parameters
+rpart.plot(model_info, type = 5, extra = 2)
+```
+
+Let's generate a new model based on gini impurity. For that we need to change a single parameter - which parameter do you think we need to change?
+
+```{r}
+model_gini <-  rpart(- - -,
+                     - - -,
+                     - - -,
+                     - - -,
+                     parms = list(split = "gini"))
+
+# Now is your turn to change other parameters
+rpart.plot(model_gini, type = 5, extra = 2)
+```
+
+# 6.2. Prune the tree - OPTIONAL
+
+We can see that not all the variables that we are using are equaly useful in our modeling, let's see if simplifiying the model might improve the fit. For that we use prune() function to estimate the best tree - the tree with the smallest cross-validated error. To automatically select the complexity parameter associated with the smallest cross-validated error we can use this line of code:"model_info$cptable[which.min(fit$cptable[,"xerror"]),"CP"]"
+
+```{r}
+p_model_info <- prune(model_info, cp = model_info$cptable[which.min(model_info$cptable[,"xerror"]),"CP"])
+
+rpart.plot(p_model_info, type = 5, extra = 2)
+```
+
+# 7. Evaluating the models
+
+We now evaluate how well our models are performing. Using our models, we can predict the decision value for the test set, and compare this to the true values. The diagnostics can be nicely summarised in a "confusion matrix".
+
+```{r}
+Predict_gini <- predict(- - - = model_gini, - - - = test, - - - = "class")
+
+confusionMatrix(data = - - -, reference = - - -)
+```
+
+
+```{r}
+Predict_info <-  predict(object = - - -, newdata = - - -, type = - - -)
+
+confusion <- confusionMatrix(data = - - -, reference = - - -)
+```
+
+So they're doing pretty well!
+
+# 8. Answer the business question!
+
+So we have a pretty great model working. Finally we can answer our question!
+
+```{r}
+#Store the confusion matrix for our model in a variable
+confusion <- confusionMatrix(data = Predict_info, reference = test$decision)
+
+# the first part is add our predictions to the unlabelled part of the data i.e. the "implement" subset
+implement$prediction <- predict(- - -, - - -, type = "class")
+
+# calculate the number of answered yes, predicted yes, and the total yes
+predict_yes <- length(implement$prediction[- - - == "yes"])
+real_yes <- length(data_labeled$decision[- - - == "yes"])
+
+# let's add these together to calculate the total yes, but first scale the predicted number by the "sensitivity"
+total_yes <- real_yes + as.numeric(confusion$byClass["Sensitivity"])*predict_yes
+
+total_people <- length(- - -)
+
+total_yes/total_people
+```
+
+A shame, it's not quite enough!
+
+
+# 9. Random forest -- OPTIONAL!
+
+"Random Forest" is an extremely powerful technique for classification (and also regression) that builds upon the basic concept of a decision tree. It works by selecting a subset of variables and performing decision trees each time with a different subset of variables. This process is repeated several times (more than 1000 times) to generate a forest of decision trees. The trick is that then the most accurate trees vote for the most important factor.
+
+To implement Random Forest we need the library `randomForest` and the function `randomForest`. Please read the documentation to select the right parameters. It is good practice to use `set.seed()` so that your model is replicable. Once you finish your random forest, compare the accuracy, sensitivity and precision between decision trees and random forest.
+
+```{r}
+library(randomForest)
+
+model_randomF <-  randomForest(decision ~ ., data = train)
+```
+
+```{r}
+Predict_RF <- predict(object = model_randomF, newdata = test, type = "class")
+
+confusionMatrix(data = Predict_RF, reference = test$decision)
+```
