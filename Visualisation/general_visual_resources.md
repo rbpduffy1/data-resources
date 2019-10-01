@@ -9,6 +9,10 @@ For visual inspiration:
 - http://drones.pitchinteractive.com/
 - https://informationisbeautiful.net/visualizations/
 
+For use of colours in different contexts:
+- Colour-blindness: https://usabilla.com/blog/how-to-design-for-color-blindness/
+- Cultural differences: https://informationisbeautiful.net/visualizations/colours-in-cultures/
+
 For what NOT to do:
 - https://viz.wtf/ 
 - https://badvisualisations.tumblr.com/
