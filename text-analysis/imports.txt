@@ -1,4 +1,4 @@
-https://pastebin.com/fuxByH8Kimport nltk  # machine learning with text
+import nltk  # machine learning with text
  
 from nltk.corpus import stopwords, wordnet  # List of common words
  
