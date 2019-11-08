@@ -2,7 +2,9 @@
 
 Access the [completed notebook](./text_analysis_completed_notebook.ipynb) for this session.
 
-In order to access this workshop's content, you will need the following import statements:
+<hr>
+
+In order to access this workshop's content, you will need the following import statements in your notebook:
 
 ```
 import pandas as pd # For dataframe manipulation
