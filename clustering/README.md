@@ -8,7 +8,6 @@ Additional material (including a fully completed notebook) can be found in your 
 
 ### Notebooks
 
-- [Completed notebook](./clustering_workshop_completed_notebook.ipynb)
 - [Learner notebook](./clustering_workshop_learner_notebook.ipynb)
 
 ### Data
