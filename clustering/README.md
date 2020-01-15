@@ -4,6 +4,20 @@ This folder has the files necessary to follow along with the clustering workshop
 
 Additional material (including a fully completed notebook) can be found in your regular course material.
 
+## Using .csv files for mapping
+
+### Notebooks
+
+- [Completed notebook](./clustering_workshop_completed_notebook.ipynb)
+- [Learner notebook](./clustering_workshop_learner_notebook.ipynb)
+
+### Data
+
+- [Demographic data](https://github.com/DecodedCo/data-resources/raw/master/datasets/clustering_workshop_data.zip)
+- [Map data](https://github.com/DecodedCo/data-resources/raw/master/datasets/city_shapes.zip)
+
+## Using shape files for mapping
+
 ### Notebooks
 
 [Python workshop files](./Python)
