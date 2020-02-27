@@ -1,0 +1,370 @@
+---
+title: "Churn prediction with Spark"
+output: html_notebook
+---
+
+# Introduction to Spark
+Spark is a computing framework for handling and analysing big data -- like Hadoop. However whilst with Hadoop, all MapReduce operations are done to and from disk, Spark does everything in-memory. This makes Hadoop great for (slow) batch processing, and Spark more optimised for faster, or even real-time analyisis.
+
+More than anything else, the goal from this notebook is to understand how we would use Spark if we so wished to, be it in a professional or personal context. Since it's a massive framework with a multitude of functionalities, this will only cover the building blocks of Spark, the basics of reading and transforming data, and making predictions (and evaluating those predictions) all through using the SparklyR library.
+
+
+*Spark itself, and therefore coding in Spark is above and beyond the BCS and EMC curricula. To reiterate the above, this is all extra material that only serves to give us a flavour of how Spark (in Python) would work if we wished to apply it.*
+
+# Business Problem
+We will attempt to go through the data pipeline by addressing a churn prediction problem: we've been asked by a marketing agency to predict their customer churn so they could pre-empt with appropriate action.
+
+
+# Libraries
+```{r}
+# Uncomment this section if you need to install Spark & SparklyR.
+
+# install.packages('sparklyr')
+# spark_install(version = '2.3')
+# install.packages('devtools')
+# devtools::install_github("rstudio/sparklyr")
+
+```
+
+For good instructions on how to install and get Spark running, check out the comprehensive RStudio documentation for SparklyR [here](https://spark.rstudio.com/).
+
+Once installed, let's go ahead and run the `library()` function to load them up.
+```{r}
+# We need SparklyR as it's our API for using Spark in R.
+library(sparklyr)
+
+# We need dplyr to manipulate data that sits in Spark dataframes.
+library(dplyr)
+
+# For string manipulation if we need it.
+library(stringr)
+```
+
+
+# 1. Initiating Spark connection
+Whenever we use Spark -- unlike what we've been used to doing so far -- we have to first initiate a 'connection'. Remember, Spark is a framework that can sit atop of massive clusters of computers, so a connection has to be made to this cluster, or to wherever the data is stored.
+
+We have lots of options here, but to name a few:
+- We can create a standalone cluster. 
+- We can connect to HDFS, if we have this set up. 
+- We can connect to various services like AWS' [EC2 instances](https://aws.amazon.com/ec2/) for example.
+- We can run it locally. 
+
+Today our goal is to try to get a flavour for Spark more than run massive production-level applications for now, so we'll stick to the local option.
+
+*Note*: A spark connection is called `sc` by convention. 
+```{r}
+# Initiate Spark connection: 
+sc <- spark_connect(master = 'local', app_name = 'churn')
+
+# Check if our connection is open now:
+spark_connection_is_open(sc)
+
+# When we're done with our code, we should always remember to disconnect, with the following:
+# spark_disconnect(sc)
+```
+
+### Notes on parameters above
+* *Master* -- This is the 'master' node, or the cluster we're connecting to. The parameter value usually comes in the form of a URL that we need to connect. E.g. 'spark://' or 'yarn-client' if running on YARN etc. 
+
+* *app_name* -- this is the name of our Spark application. In case we need to refer to it or get it later, we give it an appropriate name. 
+
+
+# 2. Read in the data 
+Before we begin reading in the data, it's important to understand that data is held and processed in Spark in a slightly different way than we're used to. The core building block of Spark is called an `RDD` or a Resilient Distributed Dataset. This is essentially a chunk of data that is, as the name suggests:
+
+- Resilient - because you cannot change an RDD (chunk), you can only create new RDDs from it.
+- Distributed - because it partitions big data into those chunks, and so RDDs are naturally partitioned.
+- Datasets - because they hold data!
+
+A Spark dataframe, which is what we'll be using today is essentially an RDD (or multiple RDDs), but with a schema, or a column structure. In other words, it's slightly different from a standard R dataframe we're used to because it has the properties above. 
+
+Let's go ahead and read our data as a Spark dataframe using the `spark_read_csv()` function, specifying the spark context (sc), and the path.
+```{r}
+churn <- spark_read_csv(sc = sc, name = 'churn', path = '/Users/alaaabedrabbo/Downloads/agency_churn.csv')
+
+# Let's get some idea of our Spark dataframe with the glimpse() function
+glimpse(churn)
+```
+
+### Note on the path parameter
+Spark needs to know exactly where the data sits, so we have to be as specific as possible when it comes to setting the path parameter. Alternatively, if we were using say, HDFS to store the data, our path might look like 'hdfs://' or if we were using AWS' S3 service, our path might read 's3://' etc.
+
+
+# 3. Get a high-level understanding of our data 
+First, let's see what type of object we're dealing with here. 
+```{r}
+class(churn)
+```
+
+Given this tibble structure, we can run standard dataframe functions we're used to, to get a sense for the data.
+```{r}
+head(churn)
+```
+
+We can equally use the ` %>% ` (pipe) syntax, that the dplyr package uses.
+```{r}
+churn %>% head()
+```
+
+Now let's get the shape of our dataframe. We do this by using the spark dataframe (sdf) functions `sdf_ncol()`, `sdf_nrow()` and `sdf_dim()`.
+
+```{r}
+# To get the number of columns
+sdf_ncol(churn)
+
+# To get the number of rows
+sdf_nrow(churn)
+
+# To get the dimensions (both columns and rows)
+sdf_dim(churn)
+```
+
+We can also return the chema for our Spark dataframe, with the `sdf_schema()` function.
+```{r}
+sdf_schema(churn)
+```
+
+There's also a plethora of 'sdf_' functions that we can use. You can explore this list by typing 'sdf_' then pressing the TAB button.
+
+For example, if we wanted to get the summary statistics for our data, we can use `sdf_describe()`.
+```{r}
+sdf_describe(churn)
+```
+
+Or if we wanted to take a random sample from our data, we could use `sdf_sample()`:
+```{r}
+sdf_sample(x = churn, fraction = 0.1, replacement = T, seed = 123)
+
+# fraction    = represents the proportion of the sample rows to the total 900 rows.
+# replacement = represents whether we are sampling with or without replacement (T or F)
+# seed        = sets a random seed to ensure reproducibility. If you run this code with different seeds, you will get a different sample every time. 
+```
+
+# 4. Query and filter our data
+We can do this in two main ways:
+1. Using the dplyr syntax
+2. Using the standard SQL syntax.
+
+We'll be doing the majority of the examples here in dplyr syntax, but we'll also get a taster for how SQL syntax works, if we wish to use that instead. 
+
+To run a standard SQL query, we can use the handy `sdf_sql()` function, and enter in any SQL query in quotations, as so.
+```{r}
+# Let's say we wanted all columns, but only 4 rows.
+sdf_sql(sc = sc, sql = 'SELECT * FROM churn LIMIT 4')
+```
+
+```{r}
+# What if we wanted to keep only the Names and Age columns, only the rows where the Age of our employees is greater than 30, and limit our output to the first 4 rows?
+sdf_sql(sc = sc, sql = 'SELECT Names, Age FROM churn WHERE Age > 30 LIMIT 4')
+```
+
+
+If you're used to using SQL, then this is likely to be an immensely useful tool, as you'll be running it all in Spark, instead of in a standard RDBMS.
+
+Today however, we'll stick to showing dplyr syntax, as SQL queries are covered in the SQL module. Notice however, how similar the naming of the functions is to SQL functions. This is because dplyr actually translates the commands into Spark SQL statements -- remember that one of the four main modules of Spark is SQL.
+```{r}
+# To filter by columns, we use the %>% and the select() function.
+churn %>% 
+  select(Names, Age) 
+```
+
+What if we wanted to find the number of unique values a column can take? For that we'll need the `distinct()` function.
+
+```{r}
+# To find the unique Age values in our dataset
+churn %>%
+  distinct(Age) 
+```
+
+And if we wanted to find the *number* of unique values the Age column takes, we'd simply pipe that through to the `count()` function.
+
+```{r}
+# How many unique values does the Age column take?
+churn %>% 
+  distinct(Age) %>% 
+  count()
+```
+
+We can also do this for all columns, using the handy `summarise_all()` function, with `n_distinct` function as our input (we could choose other R functions here as input like 'mean', and 'list' etc.).
+
+```{r}
+churn %>% 
+  summarise_all(.funs = n_distinct)
+
+# The '.funs' parameter is where we would put the function of interest.
+```
+
+So far we've covered filtering columns by using the `select()` function, but not filtering rows. We can do that with the aptly named `filter()` function (similar to WHERE in SQL).
+
+Let's try the same SQL query we tried above, this time in dplyr syntax.
+```{r}
+churn %>% 
+  select(Names, Age) %>% 
+  filter(Age >30) %>% 
+  head(4)
+```
+
+We can also filter on multiple conditions, simply by separating the conditions with a comma.
+```{r}
+churn %>% 
+  select(Names, Age, Total_Purchase) %>% 
+  filter(Age >30, Total_Purchase < 6000) %>% 
+  head()
+```
+
+What about creating columns? We can do this with the dplyr function, `mutate()`.
+```{r}
+# Let's say, we wanted to create a column that takes our Age values and doubles them. Call that 'age_doubled'.
+churn %>% 
+  select(Names, Age, Total_Purchase) %>% 
+  mutate(age_doubled = Age*2)
+```
+
+# 5. Data cleaning
+As we all know, data will naturally need to be cleaned, and transformed before we can do any meaningful analysis on it. 
+
+Looking at the above output, it seems like the Age column has at least one NA. Let's find out how many more it has.
+```{r}
+# Check for NA in one column
+churn %>% 
+  select(Names, Age) %>% 
+  filter(is.na(Age)) 
+
+```
+
+It seems like there are only 2 NAs in Age. If there were more, we would have perhaps wanted to return a number rather than all the rows. To do this we simply pipe the function above through a `count()` function.
+
+
+```{r}
+# Check for number of NAs in Age column
+churn %>% 
+  select(Names, Age) %>% 
+  filter(is.na(Age)) %>% 
+  count()
+```
+
+What about all the other NAs in all the other columns? One way to do this would be to use the handy `filter_all()` function and pass in the `.is.na()` function as input.
+
+```{r}
+# Show all the rows that have at least one NA
+churn %>% 
+  filter_all(any_vars(is.na(.)))
+```
+
+Now we can deal with those NAs individually as we might usually - e.g. replace by mean, median, or omit. It seems like 4 rows is a negligible amount however, and we are happy to simply omit those rows from our data. We can do this with the `na.omit()` function.
+
+```{r}
+# We can call our new dataframe, churn_clean
+churn_clean <- churn %>% 
+  na.omit() 
+```
+
+Finally, we can check the shape of our data to confirm:
+```{r}
+churn_clean %>% sdf_dim()
+```
+
+# 6. Feature selection
+Let's look at the schema again.
+
+```{r}
+sdf_schema(churn_clean)
+```
+
+We can see that we have varied variable types in our data. For simplicity reasons -- specifically, for not delving in too deep with one-hot encoding (or dummy variables) -- we will choose to keep numerical columns only. 
+
+This means we have to remove the following columns, which we can do with the select() function.
+```{r}
+churn_final <- churn_clean %>% 
+  select(-c(Names, Onboard_date, Location, Company))
+```
+
+To confirm, we have the following columns left, which we will now use as input to our machine learning model.
+```{r}
+colnames(churn_final)
+```
+
+# 7. Machine learning
+As with any supervised learning problem, we will need to know our target variable -- in this case the `Churn` column -- and our input features, which in our case are all the other numerical variables we kept in. 
+
+We also need to split our data into a training set, and a test set. This is important so that we are able to reliably test how well our model does on unseen data, or on future employees.
+
+To do the train/test split we use the `sdf_random_split()` function.
+
+```{r}
+# Split into train and test sets:
+partitions <- churn_final %>% 
+  sdf_random_split(train = 0.75, test = 0.25, seed = 123)
+
+# We've specified that we want our training set to constitute 75% of our data, and our test set, the rest of the 25%. We also set a seed to ensure this random sample of training data is reproducible -- i.e. if anyone else runs this code, they will get the same training and testing data, but if you change the seed number, then you will be training your model on slightly different training data, and might end up with slightly different results.
+```
+
+Let's check the dimensions of each of our subsets.
+```{r}
+# Dimensions of our training set 
+sdf_dim(partitions$train)
+
+# Dimensions of our testing set 
+sdf_dim(partitions$test)
+```
+
+Great! It seems like it's done it's job. Now we can move on to training the machine learning model on our training data. Let's stick to a simple decision tree for now. We can use the `ml_decision_tree()` function from SparklyR to do this.
+
+```{r}
+# Train our decision tree 
+dt_model <- partitions$train %>% 
+  ml_decision_tree(Churn ~ ., type = 'classification') 
+
+# Check 
+dt_model
+
+```
+
+**Note**: We specify *type = 'classification'* because we have ourselves a (binary) classification problem (churn = 1 / churn = 0). We could alternatively have run the `ml_decision_tree_classifier()` function instead. 
+
+# 8. Making predictions and evaluation
+Based on its training, let's see what our model will predict on our test set. Let's then evaluate how well it does by comparing its predictions to the actual test set `Churn` values.
+```{r}
+# Make predictions
+predictions <- ml_predict(dt_model, partitions$test)
+
+# Check output
+predictions
+```
+
+Lots of columns! Machine learning output in SparklyR looks a little different, but it's not confusing. The main columns of interest are:
+- `label` which holds our actual Churn values from the test set.
+- `prediction` which holds the predicted values 
+- `probability_0` which tells us the model's probability for this particular value to be a 0 (i.e. no churn)
+- `probability_1` which tells us the model's probability for this particular value to be a 1 (i.e. will churn)
+
+The latter two sum to 1, which means that the model will go with the highest probability. For example, if for our second row, probability_0 = 0.9375, and probability_1 = 0.0625, then the model will decide to predict 0 for that row, due to having that higher probability value. 
+
+To evaluate how well it's done, we can simply count the number of correct predictions (comparing `label` and `prediction`) and dividing that number by the total number of predictions. We could also use the handy `ml_multiclass_classification_evaluator()` function.
+```{r}
+ml_multiclass_classification_evaluator(predictions,
+                                       label_col = 'label', 
+                                       prediction_col = 'prediction', 
+                                       metric_name = 'accuracy')
+
+
+```
+82.7% accuracy - not bad for a first try! We can extend this now by using other algorithms for example.
+
+
+*Note*: We specified 'accuracy' to be our metric of choice. However, as with all classification problems, we could have gone with a number of other metrics like `f1`, `precision`, and `recall`. For more details on the options available, and the function itself, read through the [documentation](https://rdrr.io/cran/sparklyr/man/ml_evaluator.html).
+ 
+
+# Close the connection
+In a situation where we are connected to a cluster of computers (i.e not locally, but through AWS for example), usually an open connection means running costs, so we'd want to end it as soon as we are done with Spark (for now)! 
+```{r}
+spark_disconnect(sc)
+
+# Check it's done its job:
+spark_connection_is_open(sc)
+```
+
+
+
+
