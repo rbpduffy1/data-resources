@@ -13,8 +13,8 @@
 * [How to design for colour blindness](https://usabilla.com/blog/how-to-design-for-color-blindness/)
 
 ### On shape:
-* Choosing the appropriate visualisation/graph: [Option 1: Datavis project](https://datavizproject.com/).
-* Choosing the appropriate visualisation/graph: [Option 2: Data-to-viz](https://www.data-to-viz.com/)
+* Choosing the appropriate visualisation/graph: [Option 1 -- Datavis project](https://datavizproject.com/).
+* Choosing the appropriate visualisation/graph: [Option 2 -- Data-to-viz](https://www.data-to-viz.com/)
 
 ### On relation:
 * [Examples](http://theconversation.com/which-square-is-bigger-honeybees-see-visual-illusions-like-humans-do-87673) of optical illusions.
