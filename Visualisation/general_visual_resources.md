@@ -23,10 +23,10 @@
 
 ### Good visualisations
 * [Gallery](https://informationisbeautiful.net/) of inspiring visualisations from *informationisbeautiful.net*. To list a few good ones: 
-  * []()
+  * [Mega-what?](https://informationisbeautiful.net/visualizations/mega-what-the-worlds-biggest-and-most-notable-power-plants/) (energy supply worldwide).
+  * [Silicon valley most contagious ideas](https://informationisbeautiful.net/visualizations/the-bay-area-memespace-silicon-valleys-most-contagious-ideas/)
 * [Drone strikes](https://drones.pitchinteractive.com/)
 * [Google trends - year in language](https://googletrends.github.io/year-in-language/)
-* []()
 
 ### Terrible visualisations
 * [Option 1](https://viz.wtf/)
