@@ -4,7 +4,7 @@ In order to access this workshop's content, you will need to do the following:
 
 1. Download [the data](https://github.com/DecodedCo/data-resources/raw/master/datasets/apple-tweets.zip) as a zip file
 2. Unzip the file to your desired location
-3. Run the following commands (separately) in Anaconda prompt: `conda install -c conda-forge textblob nltk gensim wordcloud` & `conda install googletrans`
+3. Run the following commands (separately) in Anaconda prompt: `conda install -c conda-forge textblob nltk gensim wordcloud` & `conda install translate`
 4. Start a new notebook from the same directory as your data
 5. Run the following code in your notebook:
 
@@ -28,8 +28,6 @@ from textblob import TextBlob  # Sentiment analysis
 from gensim.models import Word2Vec  # Understand word context
 
 from translate import Translator  # Translate text
-
-from googletrans import Translator as G_Translator  # Translate text
 ```
 6. Once your notebook has successfully run the code above, run the code below in your notebook:
 
