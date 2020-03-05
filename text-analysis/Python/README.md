@@ -1,33 +1,42 @@
 # Text Analysis (Python)
 
-In order to access this workshop's content, you will need the following import statements in your notebook:
+In order to access this workshop's content, you will need to do the following:
+
+1. Download the data as a zip file
+2. Unzip the file to your desired location
+3. Run the following command in Anaconda prompt: `condal install -c conda-forge textblob nltk gensim wordcloud translate googletrans`
+4. Start a new notebook from the same directory as your data
+5. Run the following code in your notebook:
 
 ```
 import pandas as pd # For dataframe manipulation
 
 import nltk  # machine learning with text
 
-from nltk.corpus import stopwords, wordnet  # List of common words
+from nltk.corpus import stopwords # List of common words
 
 from nltk.tokenize import word_tokenize  # Split text into significant forms
-
-from nltk.stem import WordNetLemmatizer  # Reduce words to their root form ("lemma")
 
 from sklearn.feature_extraction.text import CountVectorizer  # Convert text to sparse matrices
 
 import matplotlib.pyplot as plt  # Complex visualisation configuration
 
-import seaborn as sns  # Visualisation
-
 from wordcloud import WordCloud  # Create wordclouds
 
 from textblob import TextBlob  # Sentiment analysis
-```
 
-Additionally, the lines of code below install data required by `nltk`:
+from gensim.models import Word2Vec  # Understand word context
+
+from translate import Translator  # Translate text
+
+from googletrans import Translator as G_Translator  # Translate text
+```
+6. Once your notebook has successfully run the code above, run the code below in your notebook:
 
 ```
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 ```
+
+If you see a pink message at this point, everything has worked as intended (probably).
