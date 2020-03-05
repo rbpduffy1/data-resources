@@ -4,7 +4,7 @@ In order to access this workshop's content, you will need to do the following:
 
 1. Download [the data](https://github.com/DecodedCo/data-resources/raw/master/datasets/apple-tweets.zip) as a zip file
 2. Unzip the file to your desired location
-3. Run the following command in Anaconda prompt: `condal install -c conda-forge textblob nltk gensim wordcloud translate googletrans`
+3. Run the following command in Anaconda prompt: `conda install -c conda-forge textblob nltk gensim wordcloud translate googletrans`
 4. Start a new notebook from the same directory as your data
 5. Run the following code in your notebook:
 
