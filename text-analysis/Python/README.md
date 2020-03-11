@@ -28,13 +28,11 @@ from textblob import TextBlob  # Sentiment analysis
 from gensim.models import Word2Vec  # Understand word context
 
 from translate import Translator  # Translate text
-```
-6. Once your notebook has successfully run the code above, run the code below in your notebook:
 
-```
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 ```
+6. Once your notebook has successfully run the code above, run the code below in your notebook:
 
 If you see a pink message at this point, everything has worked as intended (probably).
