@@ -33,6 +33,5 @@ nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 ```
-6. Once your notebook has successfully run the code above, run the code below in your notebook:
 
 If you see a pink message at this point, everything has worked as intended (probably).
