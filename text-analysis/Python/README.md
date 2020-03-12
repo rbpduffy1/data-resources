@@ -34,4 +34,4 @@ nltk.download('stopwords')
 nltk.download('wordnet')
 ```
 
-If you see a pink message at this point, everything has worked as intended (probably).
+If you see a pink message at this point, everything has worked as intended.
