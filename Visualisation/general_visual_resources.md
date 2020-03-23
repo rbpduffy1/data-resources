@@ -27,6 +27,8 @@
   * [Silicon valley most contagious ideas](https://informationisbeautiful.net/visualizations/the-bay-area-memespace-silicon-valleys-most-contagious-ideas/)
 * [Drone strikes](https://drones.pitchinteractive.com/)
 * [Google trends - year in language](https://googletrends.github.io/year-in-language/)
+* [Gapminder](https://www.gapminder.org/tools/#$state$time$value=2016;&marker$axis_x$zoomedMin:569.42&zoomedMax:136661.9;&axis_y$zoomedMin:18.06&zoomedMax:85.06;;;&chart-type=bubbles)
+
 
 ### Terrible visualisations
 * [Option 1](https://viz.wtf/)
@@ -43,4 +45,3 @@ Kaggle survey data: [here](
 https://docs.google.com/spreadsheets/d/1g1JXQ1R6-tZN7gjykr1asklnTMdCaKQo-1uVwK64z9E/edit#gid=1818789575)
 
 ***
-[Gapminder](https://www.gapminder.org/tools/#$state$time$value=2016;&marker$axis_x$zoomedMin:569.42&zoomedMax:136661.9;&axis_y$zoomedMin:18.06&zoomedMax:85.06;;;&chart-type=bubbles)
