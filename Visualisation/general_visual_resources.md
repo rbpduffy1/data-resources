@@ -5,7 +5,7 @@
 
 ### On colour
 * [Article](https://www.webdesignerdepot.com/2012/06/color-and-cultural-design-considerations/) on colour and cultural design considerations.
-* [Visual](https://informationisbeautiful.net/visualizations/colours-in-cultures/) on colours in culture from informationisbeautiful.net.
+* [Visual](https://informationisbeautiful.net/visualizations/colours-in-cultures/) on colours in culture from *informationisbeautiful.net*.
 * [Blog](https://blog.datawrapper.de/colors/) on choosing colours.
 * [Colour symbolism](https://www.canva.com/learn/color-meanings-symbolism/)
 * ["Colors in action"](https://projects.susielu.com/viz-palette) - with user-friendly options for comparing types of colour blindness.
