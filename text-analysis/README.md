@@ -4,5 +4,5 @@
 
 [R workshop resources](./R)
 
-[Tweets data](https://github.com/DecodedCo/data-resources/raw/master/datasets/apple-tweets.zip)
+[Workshop data](https://github.com/DecodedCo/data-resources/raw/master/datasets/text_analysis_workshop_data.zip)
 
