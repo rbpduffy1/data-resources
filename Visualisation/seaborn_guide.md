@@ -1,4 +1,4 @@
-# Seaborn guide
+# Seaborn -- A quick guide
 All Seaborn functions follow some basic rules. 
 
 * We need our variable, `x`.
