@@ -8,7 +8,10 @@ All Seaborn functions follow some basic rules.
 
 Below is a quick guide to how Seaborn functions work. *Note that this is not a comprehensive list of all seaborn functions! There are many more.*
 
-|No. of variables|Data type(s)|Graph name|Seaborn function|Necessary parameters|
+|No. of variables|Data type(s)|Graph type(s)|Seaborn function|Necessary parameters|
 | --- | --- | --- | --- | --- |
-| a | a | a | a | a |
+| One | Numerical | Distribution plot/Histogram | sns.distplot() | `a`; `data` |
+| One | Numerical | Distribution plot/Histogram | sns.distplot() | `a`; `data` |
+| One | Numerical | Distribution plot/Histogram | sns.distplot() | `a`; `data` |
+| One | Numerical | Distribution plot/Histogram | sns.distplot() | `a`; `data` |
 
