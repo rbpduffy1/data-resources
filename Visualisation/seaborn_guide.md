@@ -10,7 +10,7 @@ Below is a quick guide to how Seaborn functions work. *Note that this is not a c
 
 |No. of variables|Data type(s)|Graph type(s)|Seaborn function|Necessary parameters|
 | --- | --- | --- | --- | --- |
-| One | Numerical | Distribution plot/Histogram | sns.distplot() | `a`; `data` |
+| One | Numerical | Distribution plot/Histogram | sns.distplot() | * `a`; <br>* `data` |
 | One | Numerical | Distribution plot/Histogram | sns.distplot() | `a`; `data` |
 | One | Numerical | Distribution plot/Histogram | sns.distplot() | `a`; `data` |
 | One | Numerical | Distribution plot/Histogram | sns.distplot() | `a`; `data` |
