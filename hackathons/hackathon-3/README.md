@@ -1,3 +1,3 @@
 # Hackathon 3 resources
 
-[#datascience tweets](../../datasets/datascience_tweet.zip)
+[#datascience tweets](https://github.com/DecodedCo/data-resources/raw/master/hackathons/hackathon-3/datascience_tweets.zip)
