@@ -58,6 +58,12 @@ Tweets for the hashtags #bitcoin or #crypto can be accessed from [this link](htt
 
 A dataset of roughly 200,000 tweets to [#datascience](https://github.com/DecodedCo/data-resources/raw/master/hackathons/hackathon-3/datascience_tweets.zip)
 
-## 5. Your own idea
+## 5. Tweets from the Financial Times API
+**Suggested analysis:**
+Apply text analysis techniques against a [dataset](https://github.com/DecodedCo/data-resources/tree/master/hackathons/hackathon-3) summarising 4,000 Financial Times articles with the term ‘banks’ present.
+
+Please speak to your facilitators if you would like to pull similar FT article data based on a different term.
+
+## 6. Your own idea
 
 As always, you are free to explore your own areas of interest, further develop your projects, or explore any internal data you may have access to.
