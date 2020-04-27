@@ -8,7 +8,7 @@ In order to access this workshop's content, you will need to do the following:
 4. Start a new notebook from the same directory as your data
 5. Run the following code in your notebook:
 
-```
+```python
 import pandas as pd  # Manage datasets
 from nltk.sentiment.vader import SentimentIntensityAnalyzer  # Sentiment in social media
 import seaborn as sns  # Plotting
