@@ -1,3 +1,3 @@
 # Data in Context - workshop resources
 
-[Workshoop document](./data-in-context-workshop-document.pdf)
+[Workshop document](./data_in_context_workshop_document.pdf)
