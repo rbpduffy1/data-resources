@@ -1,12 +1,17 @@
 # Text Analysis (Python)
 
-In order to access this workshop's content, you will need to do the following:
+## Setup instructions
+
+### Data source
 
 1. Download [the data](https://github.com/DecodedCo/data-resources/raw/master/datasets/apple-tweets.zip) as a zip file
 2. Unzip the file to your desired location
-3. Run the following command in Anaconda prompt: `conda install -c conda-forge nltk wordcloud`
-4. Start a new notebook from the same directory as your data
-5. Run the following code in your notebook:
+
+### Libraries
+
+1. Run the following command in Anaconda prompt: `conda install -c conda-forge nltk wordcloud`
+2. Start a new notebook in the same directory as your (unzipped) data file
+3. Run the following code in your notebook:
 
 ```python
 import pandas as pd  # Manage datasets
@@ -26,3 +31,7 @@ nltk.download("vader_lexicon")
 ```
 
 If you see a pink message at this point, everything has worked as intended.
+
+## Resources
+
+[Completed workshop notebook](./text_analysis_workshop_completed_notebook.ipynb)
