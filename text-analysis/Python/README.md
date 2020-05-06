@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt  # Visualisation
 from wordcloud import WordCloud  # Wordclouds
 from pandas.core.common import flatten  # Collapse lists of lists
 
+import nltk
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
