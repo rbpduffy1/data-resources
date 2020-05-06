@@ -36,3 +36,11 @@ If you see a pink message at this point, everything has worked as intended.
 ## Resources
 
 [Completed workshop notebook](./text_analysis_workshop_completed_notebook.ipynb)
+
+## Required regular expressions
+
+- Remove hashtags and mentions: `[@#]\w+`
+
+- Remove URLs: `http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+`
+
+- Remove all non-letter characters: `[^a-z ]`
