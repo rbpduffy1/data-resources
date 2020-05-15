@@ -10,7 +10,7 @@ Below is a quick guide to how Seaborn functions work. *Note that this is not a c
 
 |No. of variables|Data type(s)|Graph type(s)|Seaborn function|Necessary parameters|Interesting optional parameters |
 | --- | --- | --- | --- | --- | --- |
-| One | Numerical | Distribution plot/Histogram | sns.distplot() | `a`; <br>`data` | `hue`; <br> `kde`; <br> `bins`; |
+| One | Numerical | Distribution plot/Histogram | sns.distplot() | `a`; <br>`data` | `kde`; <br> `bins`; |
 | One | Categorical | Count plot | sns.countplot() | `x`; <br>`data` | `hue`; <br> `dodge`; <br> `y` (instead of `x`) |
 | Two | Numerical, Numerical | Scatter plot; <br> Regresson plot; <br> Line graph| sns.scatterplot(); <br> sns.regplot(); sns.lineplot() | `x`; <br> `y`;<br>`data` | `hue`; <br>`size`; <br>`color`; <br>`palette` |
 | Two | Numerical, Categorical | Bar graph; <br> Box plot; <br> Swarm plot; <br> Violin plot | sns.barplot(); <br> sns.boxplot(); <br> sns.boxenplot(); <br>sns.swarmplot(); <br> sns.violinplot() | `x`; <br>`y`; <br>`data` | `hue`; <br> `dodge`; <br>`color`; <br>`palette`  | asda | 
