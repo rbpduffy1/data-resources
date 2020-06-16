@@ -4,7 +4,7 @@
 
 ### Data source
 
-1. Download [the data](https://github.com/DecodedCo/data-resources/raw/master/datasets/apple-tweets.zip) as a zip file
+1. Download [the data](https://github.com/DecodedCo/data-resources/raw/master/datasets/apple_tweets.zip) as a zip file
 2. Unzip the file to your desired location
 
 ### Libraries
