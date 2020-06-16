@@ -4,8 +4,8 @@
 
 ### Data source
 
-1. Download [the data](https://github.com/DecodedCo/data-resources/raw/master/datasets/apple_tweets.zip) as a zip file
-2. Unzip the file to your desired location
+1. Download [the data](https://github.com/DecodedCo/data-resources/raw/master/datasets/text_analysis_workshop_data.zip) as a zip file
+2. Unzip the file and move it to the same location as you normally run notebooks from
 
 ### Libraries
 
@@ -25,10 +25,7 @@ from wordcloud import WordCloud  # Wordclouds
 from pandas.core.common import flatten  # Collapse lists of lists
 
 import nltk
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download("vader_lexicon")
+nltk.download("all")
 ```
 
 If you see a pink message at this point, everything has worked as intended.
@@ -40,7 +37,5 @@ If you see a pink message at this point, everything has worked as intended.
 ## Required regular expressions
 
 - Remove hashtags and mentions: `[@#]\w+`
-
-- Remove URLs: `http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+`
 
 - Remove all non-letter characters: `[^a-z ]`
