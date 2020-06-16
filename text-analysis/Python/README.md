@@ -40,4 +40,4 @@ If you see a pink message at this point, everything has worked as intended.
 
 - Remove hashtags and mentions: `[@#]\w+`
 
-- Collapse multiple spaces: ` +`
+- Collapse multiple spaces: `\s+`
