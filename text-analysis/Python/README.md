@@ -14,6 +14,7 @@
 3. Run the following code in your notebook:
 
 ```python
+import nltk  # Word lists
 import pandas as pd  # Manage datasets
 from nltk.sentiment.vader import SentimentIntensityAnalyzer  # Sentiment in social media
 import seaborn as sns  # Plotting
@@ -24,7 +25,8 @@ import matplotlib.pyplot as plt  # Visualisation
 from wordcloud import WordCloud  # Wordclouds
 from pandas.core.common import flatten  # Collapse lists of lists
 
-import nltk
+# Download word lists
+
 nltk.download("all")
 ```
 
@@ -38,4 +40,4 @@ If you see a pink message at this point, everything has worked as intended.
 
 - Remove hashtags and mentions: `[@#]\w+`
 
-- Remove all non-letter characters: `[^a-z ]`
+- Collapse multiple spaces: ` +`
