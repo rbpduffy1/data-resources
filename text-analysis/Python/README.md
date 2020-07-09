@@ -30,7 +30,7 @@ from pandas.core.common import flatten  # Collapse lists of lists
 nltk.download("all")
 ```
 
-If you see a pink message at this point, everything has worked as intended.
+If you see a pink message at this point, everything has worked as intended. If you see an error message, please refer to the [installation errors](#installation-errors) section at the end of this document.
 
 ## Resources
 
@@ -41,3 +41,27 @@ If you see a pink message at this point, everything has worked as intended.
 - Remove hashtags and mentions: `[@#]\w+`
 
 - Collapse multiple spaces: `\s+`
+
+## Installation errors
+
+Please note that the downloader application used here may be blocked by firewalls within your work environment. This is likely due to security restrictions preventing code from calling resources by URL.
+
+If this is the case, you will need to first comment out the line containing nltk.download(), so that it does not run as part of the code. After this, download the [ntlk_data file](https://github.com/DecodedCo/data-resources/raw/master/datasets/text_analysis_workshop_nltk_data.zip).
+
+Once the file has downloaded, you will need to place it in the appropriate directory. This varies between machines, but the options below should work for different operating systems:
+
+### For Windows
+
+`~[user directory]\AppData\Roaming\`
+
+You will need to enter the path up to AppData directly into File Explorer as it is a hidden folder.
+
+### For Mac
+
+`~[user directory]\`
+
+Place the file inside the directory, and unzip it. It should create a folder called "nltk_data" in the same location.
+If you work in an environment, where you cannot alter the AppData directory, or changes are wiped within the same directory, alternative locations to store in the nltk_data folder, these can placed in:
+
+- The root folder of your Anaconda/Miniconda installation
+- The root of other drives, where data does not get wiped
