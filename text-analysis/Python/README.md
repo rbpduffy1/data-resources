@@ -9,10 +9,13 @@
 
 ### Libraries
 
-This workshop requires several libraries, two of which you are unlikely to already have installed. In order to install those libraries, do one of the following (depending on your normal installation method):
+This workshop requires several libraries, two of which you are unlikely to already have installed. In order to install those libraries, run the following command in the terminal:
 
-- In Anaconda prompt, run `conda install -c conda-forge nltk wordcloud`
-- In the terminal, run `pip install nltk wordcloud`
+`pip install nltk wordcloud`
+
+If you normally use `conda` to install libraries, rather than `pip`, then open Anaconda Prompt and run this command instead:
+
+`conda install -c conda-forge nltk wordcloud`
 
 In order to check that the libraries have installed correctly, and that you have all the other necessary modules, complete the following steps:
 
