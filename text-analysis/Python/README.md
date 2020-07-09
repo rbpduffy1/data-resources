@@ -9,9 +9,15 @@
 
 ### Libraries
 
-1. Run the following command in Anaconda prompt: `conda install -c conda-forge nltk wordcloud`
-2. Start a new notebook in the same directory as your (unzipped) data file
-3. Run the following code in your notebook:
+This workshop requires several libraries, two of which you are unlikely to already have installed. In order to install those libraries, do one of the following (depending on your normal installation method):
+
+- In Anaconda prompt, run `conda install -c conda-forge nltk wordcloud`
+- In the terminal, run `pip install nltk wordcloud`
+
+In order to check that the libraries have installed correctly, and that you have all the other necessary modules, complete the following steps:
+
+1. Start a new notebook in the same directory as your (unzipped) data file
+2. Run the following code in your notebook:
 
 ```python
 import nltk  # Word lists
@@ -24,7 +30,17 @@ from collections import Counter  # Count word frequency
 import matplotlib.pyplot as plt  # Visualisation
 from wordcloud import WordCloud  # Wordclouds
 from pandas.core.common import flatten  # Collapse lists of lists
+```
 
+There should be **no output** from this cell.
+
+If the code above runs without error, you've got all the libraries required for the workshop installed. If any of the libraries fail to import, you'll need to install each one using `conda` or `pip`, depending on your specific tech setup.
+
+### Required data files
+
+The workshop also requires some supplementary data files. Inside your notebook, run the following code:
+
+```python
 # Download word lists
 
 nltk.download("all")
