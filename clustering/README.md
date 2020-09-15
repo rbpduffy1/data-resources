@@ -4,16 +4,15 @@ This folder has the files necessary to follow along with the clustering workshop
 
 Additional material (including a fully completed notebook) can be found in your regular course material.
 
-## Using .csv files for mapping
-
-
-### Data
+## Data
 
 - [Demographic data](https://github.com/DecodedCo/data-resources/raw/master/datasets/clustering_workshop_data.zip)
-- [Map data](https://github.com/DecodedCo/data-resources/raw/master/datasets/city_shapes.zip)
+- [Map data (optional)](https://github.com/DecodedCo/data-resources/raw/master/datasets/city_shapes.zip)
 
-## Using shape files for mapping
+## Notebooks
 
+
+## Using shape files for mapping (optional)
 
 
 ### Data
