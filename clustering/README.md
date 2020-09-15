@@ -2,8 +2,6 @@
 
 This folder has the files necessary to follow along with the clustering workshop.
 
-Additional material (including a fully completed notebook) can be found in your regular course material.
-
 ## Data
 
 - [Demographic data](https://github.com/DecodedCo/data-resources/raw/master/datasets/clustering_workshop_data.zip)
@@ -11,6 +9,8 @@ Additional material (including a fully completed notebook) can be found in your 
 
 ## Notebooks
 
+- [Completed notebook](clustering_workshop_completed_notebook.ipynb)
+- [Map extra notebook (optional)](clustering_workshop_map_optional.ipynb)
 
 ## Using shape files for mapping (optional)
 
