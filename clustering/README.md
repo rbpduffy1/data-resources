@@ -6,9 +6,6 @@ Additional material (including a fully completed notebook) can be found in your 
 
 ## Using .csv files for mapping
 
-### Notebooks
-
-- [Learner notebook](./clustering_workshop_learner_notebook.ipynb)
 
 ### Data
 
@@ -17,9 +14,7 @@ Additional material (including a fully completed notebook) can be found in your 
 
 ## Using shape files for mapping
 
-### Notebooks
 
-[Python workshop files](./Python)
 
 ### Data
 
