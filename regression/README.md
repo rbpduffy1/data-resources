@@ -11,3 +11,4 @@
 * regression_ecommerce_data.csv
 * regression_workshop_guided.ipynb
 * regression_workshop_resources.zip
+* regression_workshop_completed.ipynb.zip
