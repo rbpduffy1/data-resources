@@ -10,3 +10,7 @@
 ## Data
 
 [Data](churn.csv)
+
+## Packages
+
+This workshop requires the Python package `imbalanced-learn` which can be installed via pip via `pip install imbalanced-learn`.
