@@ -10,7 +10,7 @@ This repository contains dataset and resources to accompany Data Academy worksho
 
 [Big Data](./big-data/README.md)
 
-[Classification I](./classification_1/README.md)
+[Classification I](./classification-1/README.md)
 
 [Data Science in a Day](./data-science-in-a-day/README.md)
 
