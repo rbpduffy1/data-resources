@@ -12,6 +12,8 @@ This repository contains dataset and resources to accompany Data Academy worksho
 
 [Classification I](./classification-I/README.md)
 
+[Classification II](./classification-II/README.md)
+
 [Data Science in a Day](./data-science-in-a-day/README.md)
 
 [Network Analysis](./network-analysis/README.md)
