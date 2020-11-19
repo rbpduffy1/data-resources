@@ -17,4 +17,4 @@
 
 [Guided notebook](neural_networks_and_model_persistence_guided.ipynb)
 
-[Completed notebook](neural_networks_and_model_persistence_completed.ipynb)
+[Completed notebook](neural_networks_and_model_persistence_complete.ipynb)
