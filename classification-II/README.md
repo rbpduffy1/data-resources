@@ -15,6 +15,6 @@
 
 ## Notebooks
 
-[Guided notebook](neural_networks_and_model_persistence_guided.ipynb)
+[Neural Networks Guided notebook](neural_networks_and_model_persistence_guided.ipynb)
 
-[Completed notebook](neural_networks_and_model_persistence_complete.ipynb)
+[Neural Networks Completed notebook](neural_networks_and_model_persistence_complete.ipynb)
