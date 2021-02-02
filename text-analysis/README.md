@@ -1,6 +1,8 @@
 # Text analysis
 
-[Python workshop resources](./Python/README.md)
+## Notebooks
+* [Guided notebook](Python/workshop_guided.ipynb)
+* [Completed notebook](Python/workshop_completed.ipynb)
 
-[R workshop resources](./R)
-
+## Data
+* [Tweets to @Apple](Python/apple_tweets.csv)
