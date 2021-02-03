@@ -2,11 +2,6 @@
 
 ## Setup instructions
 
-### Data source
-
-1. Download [the data](https://github.com/DecodedCo/data-resources/raw/master/datasets/text_analysis_workshop_data.zip) as a zip file
-2. Unzip the file and move it to the same location as you normally run notebooks from
-
 ### Libraries
 
 This workshop requires several libraries, two of which you are unlikely to already have installed. In order to install those libraries, run the following command in the terminal:
