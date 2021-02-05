@@ -4,13 +4,13 @@
 
 ### Libraries
 
-This workshop requires several libraries, two of which you are unlikely to already have installed. In order to install those libraries, run the following command in the terminal:
+This workshop requires an important library, which you are unlikely to already have installed. In order to install it, run the following command in the terminal:
 
-`pip install nltk wordcloud`
+`pip install nltk`
 
 If you normally use `conda` to install libraries, rather than `pip`, then open Anaconda Prompt and run this command instead:
 
-`conda install -c conda-forge nltk wordcloud`
+`conda install -c conda-forge nltk`
 
 In order to check that the libraries have installed correctly, and that you have all the other necessary modules, complete the following steps:
 
@@ -18,16 +18,15 @@ In order to check that the libraries have installed correctly, and that you have
 2. Run the following code in your notebook:
 
 ```python
-import nltk  # Word lists
-import pandas as pd  # Manage datasets
-from nltk.sentiment.vader import SentimentIntensityAnalyzer  # Sentiment in social media
-import seaborn as sns  # Plotting
-from nltk.tokenize import word_tokenize  # Split text into words
-from nltk.corpus import stopwords  # Lists of unimportant words
-from collections import Counter  # Count word frequency
-import matplotlib.pyplot as plt  # Visualisation
-from wordcloud import WordCloud  # Wordclouds
-from pandas.core.common import flatten  # Collapse lists of lists
+import nltk  # our go-to tool for text processing
+import pandas as pd  # for data manipulation and loading
+from nltk.sentiment.vader import SentimentIntensityAnalyzer  # for sentiment analysis
+import seaborn as sns  # for plotting
+from nltk.tokenize import word_tokenize, sent_tokenize  # for word and sentence tokenisation
+from nltk.corpus import stopwords  # lists of unimportant words (in several languages)
+from collections import Counter  # to count word frequencies
+import matplotlib.pyplot as plt  # for visualisation
+from pandas.core.common import flatten  # to collapse lists of lists
 ```
 
 There should be **no output** from this cell.
