@@ -48,13 +48,14 @@ If you see a pink message at this point, everything has worked as intended. If y
 
 ## Resources
 
-[Completed workshop notebook](./text_analysis_workshop_completed_notebook.ipynb)
+* [Completed workshop notebook](workshop_completed.ipynb)
+* [Dataset for this workshop (a collection of tweets to @Apple)](apple_tweets.csv)
 
-## Required regular expressions
+## Instructions for downloading the data
 
-- Remove hashtags and mentions: `[@#]\w+`
-
-- Collapse multiple spaces: `\s+`
+* Go to [this link](apple_tweets.csv).
+* Click the **download** button on the right, which should take you to a text page - this is the raw CSV file being displayed in your browser.
+* Right click on the page and select "save as". If your computer doesn't recognise the file type automatically (comma-separated values, or CSV), select "all files" for the format and name the file `apple_tweets.csv`.
 
 ## Installation errors
 
